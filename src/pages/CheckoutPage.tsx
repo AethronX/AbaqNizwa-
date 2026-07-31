@@ -1,0 +1,483 @@
+import React, { useState } from 'react';
+import { useStore } from '../context/StoreContext';
+import { useLanguage } from '../context/LanguageContext';
+import { Order } from '../types';
+import {
+  CreditCard,
+  CheckCircle2,
+  Truck,
+  Calendar,
+  Clock,
+  ShieldCheck,
+  User,
+  MapPin,
+  Sparkles,
+  ArrowRight,
+  ArrowLeft,
+  PackageCheck,
+  MessageCircle
+} from 'lucide-react';
+
+interface CheckoutPageProps {
+  onOrderCompleted: (order: Order) => void;
+  onBackToCart: () => void;
+}
+
+export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, onBackToCart }) => {
+  const { cart, cartSubtotal, discountAmount, deliveryFee, cartTotal, formatPrice, createOrder, appliedCoupon } = useStore();
+  const { t, language } = useLanguage();
+
+  const [customerName, setCustomerName] = useState(language === 'en' ? 'Fatma Al-Zadjali' : 'فاطمة الزدجالية');
+  const [customerPhone, setCustomerPhone] = useState('+968 98765432');
+  const [customerEmail, setCustomerEmail] = useState('fatma.z@gmail.com');
+
+  const [city, setCity] = useState(language === 'en' ? 'Muscat' : 'مسقط');
+  const [area, setArea] = useState(language === 'en' ? 'Al-Qurm' : 'القرم');
+  const [street, setStreet] = useState(language === 'en' ? 'Sultan Qaboos Street' : 'شارع السلطان قابوس');
+  const [building, setBuilding] = useState(language === 'en' ? 'Villa 42' : 'فيلا 42');
+  const [notes, setNotes] = useState(language === 'en' ? 'Please call 15 minutes prior to arrival' : 'يرجى الاتصال قبل الوصول بـ 15 دقيقة');
+
+  const [isForSomeoneElse, setIsForSomeoneElse] = useState(true);
+  const [recipientName, setRecipientName] = useState(language === 'en' ? 'Said Al-Busaidi' : 'سعيد البوسعيدي');
+  const [recipientPhone, setRecipientPhone] = useState('+968 91234567');
+
+  const [deliveryDate, setDeliveryDate] = useState(
+    new Date(Date.now() + 86400000).toISOString().split('T')[0]
+  );
+  const [deliveryTime, setDeliveryTime] = useState(language === 'en' ? '5:00 PM - 8:00 PM (Evening)' : '17:00 - 20:00 (مساءً)');
+  const [paymentMethod, setPaymentMethod] = useState<'apple_pay' | 'thawani' | 'visa' | 'cod'>('apple_pay');
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [placedOrder, setPlacedOrder] = useState<Order | null>(null);
+
+  const handleSubmitOrder = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    setTimeout(() => {
+      const newOrder = createOrder({
+        customerName,
+        customerPhone,
+        customerEmail,
+        recipientName: isForSomeoneElse ? recipientName : customerName,
+        recipientPhone: isForSomeoneElse ? recipientPhone : customerPhone,
+        shippingAddress: {
+          city,
+          area,
+          street,
+          building,
+          notes,
+        },
+        deliveryDate,
+        deliveryTime,
+        paymentMethod,
+        paymentStatus: paymentMethod === 'cod' ? 'pending' : 'paid',
+        items: cart,
+        subtotal: cartSubtotal,
+        discount: discountAmount,
+        deliveryFee,
+        total: cartTotal,
+        couponCode: appliedCoupon?.code,
+      });
+
+      setIsSubmitting(false);
+      setPlacedOrder(newOrder);
+    }, 1200);
+  };
+
+  // Oman Cities
+  const omanCities = language === 'en'
+    ? ['Muscat', 'Nizwa', 'Salalah', 'Sohar', 'Sur', 'Ibri', 'Rustaq', 'Barka', 'Ibra']
+    : ['مسقط', 'نزوى', 'صلالة', 'صحار', 'صور', 'عبري', 'الرستاق', 'بركاء', 'إبرا'];
+
+  if (placedOrder) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-16 text-center space-y-6 animate-fadeIn">
+        <div className="w-20 h-20 bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 rounded-full flex items-center justify-center mx-auto shadow-inner">
+          <CheckCircle2 className="w-10 h-10" />
+        </div>
+
+        <div className="space-y-2">
+          <span className="text-xs bg-[#D4AF37] text-[#7D0A0A] font-extrabold px-3 py-1 rounded-full inline-block">
+            {language === 'en' ? 'Completed Successfully ✨' : 'تمت العملية بنجاح ✨'}
+          </span>
+          <h1 className="text-3xl font-extrabold font-heading text-gray-900 dark:text-gray-100">
+            {t('order_placed_success')}
+          </h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {t('order_number_is')} <strong className="text-[#7D0A0A] dark:text-[#D4AF37] text-lg">{placedOrder.orderNumber}</strong>
+          </p>
+        </div>
+
+        <div className="bg-white dark:bg-[#151111] p-6 rounded-3xl border border-gray-100 dark:border-gray-800 text-start text-xs space-y-3 max-w-lg mx-auto shadow-md">
+          <div className="flex justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
+            <span className="text-gray-500">{language === 'en' ? 'Recipient:' : 'المستلم:'}</span>
+            <span className="font-bold text-gray-900 dark:text-gray-100">{placedOrder.recipientName} ({placedOrder.recipientPhone})</span>
+          </div>
+          <div className="flex justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
+            <span className="text-gray-500">{language === 'en' ? 'Delivery Date & Slot:' : 'تاريخ وتوقيت التسليم:'}</span>
+            <span className="font-bold text-gray-900 dark:text-gray-100">{placedOrder.deliveryDate} ({placedOrder.deliveryTime})</span>
+          </div>
+          <div className="flex justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
+            <span className="text-gray-500">{language === 'en' ? 'Payment Method:' : 'طريقة الدفع:'}</span>
+            <span className="font-bold text-[#7D0A0A] dark:text-[#D4AF37] uppercase">{placedOrder.paymentMethod}</span>
+          </div>
+          <div className="flex justify-between pt-1 text-sm font-extrabold">
+            <span>{language === 'en' ? 'Total Amount Paid:' : 'إجمالي المبلغ المدفوع:'}</span>
+            <span className="text-[#7D0A0A] dark:text-[#D4AF37]">{formatPrice(placedOrder.total)}</span>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
+          <button
+            onClick={() => onOrderCompleted(placedOrder)}
+            className="bg-[#7D0A0A] hover:bg-[#5A0707] text-white px-8 py-3.5 rounded-full font-bold text-sm shadow-xl flex items-center gap-2 border border-[#D4AF37]/50"
+          >
+            <PackageCheck className="w-4 h-4 text-[#D4AF37]" />
+            <span>{language === 'en' ? 'Track Order Status Live' : 'تتبع شحنة الطلب مباشرة'}</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 animate-fadeIn">
+      <button
+        onClick={onBackToCart}
+        className="inline-flex items-center gap-2 text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-[#7D0A0A] transition-colors"
+      >
+        {language === 'en' ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
+        <span>{language === 'en' ? 'Back to Gift Basket' : 'العودة لسلة الهدايا'}</span>
+      </button>
+
+      <div className="border-b border-gray-100 dark:border-gray-800 pb-4 space-y-4">
+        {/* Checkout Steps Progress Bar */}
+        <div className="flex items-center justify-between max-w-2xl mx-auto bg-gray-50 dark:bg-[#151111] p-3 rounded-2xl border border-gray-100 dark:border-gray-800 text-xs font-bold">
+          <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+            <CheckCircle2 className="w-4 h-4" />
+            <span>{language === 'en' ? '1. Gift Basket' : '١. السلة المختارة'}</span>
+          </div>
+          <span className="text-gray-300">➔</span>
+          <div className="flex items-center gap-1.5 text-[#7D0A0A] dark:text-[#D4AF37]">
+            <MapPin className="w-4 h-4" />
+            <span>{language === 'en' ? '2. Address & Recipient' : '٢. العنوان والمستلم'}</span>
+          </div>
+          <span className="text-gray-300">➔</span>
+          <div className="flex items-center gap-1.5 text-gray-400">
+            <CreditCard className="w-4 h-4" />
+            <span>{language === 'en' ? '3. Royal Payment' : '٣. الدفع الفاخر'}</span>
+          </div>
+        </div>
+
+        <div className="text-center sm:text-start">
+          <h1 className="text-3xl font-extrabold font-heading text-gray-900 dark:text-gray-100">
+            {t('checkout_title')}
+          </h1>
+          <p className="text-xs text-gray-500">
+            {language === 'en'
+              ? 'Enter delivery details and recipient address to choose your preferred payment option'
+              : 'أدخل تفاصيل التوصيل وعنوان المستلم لاختيار وسيلة الدفع المناسبة'}
+          </p>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmitOrder} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* Left 2 Cols: Shipping & Payment */}
+        <div className="lg:col-span-2 space-y-6">
+          
+          {/* Section 1: Customer Info */}
+          <div className="bg-white dark:bg-[#151111] p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm space-y-4">
+            <h3 className="font-bold font-heading text-base text-gray-900 dark:text-gray-100 flex items-center gap-2">
+              <User className="w-5 h-5 text-[#7D0A0A] dark:text-[#D4AF37]" />
+              <span>{language === 'en' ? '1. Sender Details' : '١. بيانات صاحب الطلب'}</span>
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+              <div>
+                <label className="font-semibold block mb-1">{language === 'en' ? 'Full Name:' : 'الاسم الكامل:'}</label>
+                <input
+                  type="text"
+                  required
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  className="w-full bg-gray-50 dark:bg-gray-800 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700"
+                />
+              </div>
+
+              <div>
+                <label className="font-semibold block mb-1">{language === 'en' ? 'Phone Number:' : 'رقم الهاتف:'}</label>
+                <input
+                  type="text"
+                  required
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value)}
+                  className="w-full bg-gray-50 dark:bg-gray-800 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700"
+                />
+              </div>
+
+              <div>
+                <label className="font-semibold block mb-1">{language === 'en' ? 'Email Address:' : 'البريد الإلكتروني:'}</label>
+                <input
+                  type="email"
+                  required
+                  value={customerEmail}
+                  onChange={(e) => setCustomerEmail(e.target.value)}
+                  className="w-full bg-gray-50 dark:bg-gray-800 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section 2: Recipient Details */}
+          <div className="bg-white dark:bg-[#151111] p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold font-heading text-base text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-[#7D0A0A] dark:text-[#D4AF37]" />
+                <span>{language === 'en' ? '2. Recipient Address & Delivery' : '٢. عنوان المستلم والتوصيل'}</span>
+              </h3>
+              <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isForSomeoneElse}
+                  onChange={(e) => setIsForSomeoneElse(e.target.checked)}
+                  className="w-4 h-4 accent-[#7D0A0A]"
+                />
+                <span>{language === 'en' ? 'Send as Gift to Someone Else' : 'إهداء لشخص آخر'}</span>
+              </label>
+            </div>
+
+            {isForSomeoneElse && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs p-3 bg-[#FCECEF]/40 dark:bg-gray-800/50 rounded-2xl border border-[#7D0A0A]/20">
+                <div>
+                  <label className="font-semibold block mb-1">{language === 'en' ? 'Recipient Full Name:' : 'اسم المستلم للهداية:'}</label>
+                  <input
+                    type="text"
+                    required
+                    value={recipientName}
+                    onChange={(e) => setRecipientName(e.target.value)}
+                    className="w-full bg-white dark:bg-gray-800 p-2 rounded-xl border border-gray-300 dark:border-gray-700"
+                  />
+                </div>
+                <div>
+                  <label className="font-semibold block mb-1">{language === 'en' ? 'Recipient WhatsApp Phone:' : 'هاتف المستلم (واتساب):'}</label>
+                  <input
+                    type="text"
+                    required
+                    value={recipientPhone}
+                    onChange={(e) => setRecipientPhone(e.target.value)}
+                    className="w-full bg-white dark:bg-gray-800 p-2 rounded-xl border border-gray-300 dark:border-gray-700"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Quick Address Presets */}
+            <div className="space-y-1.5 pt-1">
+              <span className="text-[11px] font-bold text-[#7D0A0A] dark:text-[#D4AF37] block">
+                {language === 'en' ? '📍 Quick Address Fill Shortcuts:' : '📍 اختصارات تعبئة العنوان السريعة:'}
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  { label: language === 'en' ? 'Muscat - Qurum' : 'مسقط - القرم', c: language === 'en' ? 'Muscat' : 'مسقط', a: language === 'en' ? 'Qurum' : 'القرم', s: language === 'en' ? 'Sultan Qaboos St' : 'شارع السلطان قابوس' },
+                  { label: language === 'en' ? 'Muscat - Seeb' : 'مسقط - السيب', c: language === 'en' ? 'Muscat' : 'مسقط', a: language === 'en' ? 'Seeb' : 'السيب', s: language === 'en' ? 'Al Mouj St' : 'شارع الموج' },
+                  { label: language === 'en' ? 'Nizwa - Heritage Qtr' : 'نزوى - حي التراث', c: language === 'en' ? 'Nizwa' : 'نزوى', a: language === 'en' ? 'Al Turath' : 'حي التراث', s: language === 'en' ? 'Nizwa Fort St' : 'شارع قلعة نزوى' },
+                  { label: language === 'en' ? 'Sohar - Corniche' : 'صحار - الكورنيش', c: language === 'en' ? 'Sohar' : 'صحار', a: language === 'en' ? 'Waqibah' : 'الوقيبة', s: language === 'en' ? 'Corniche St' : 'شارع الكورنيش' },
+                  { label: language === 'en' ? 'Salalah - Saada' : 'صلالة - السعادة', c: language === 'en' ? 'Salalah' : 'صلالة', a: language === 'en' ? 'Saada' : 'السعادة', s: language === 'en' ? 'Salam St' : 'شارع السلام' },
+                ].map((preset) => (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => {
+                      setCity(preset.c);
+                      setArea(preset.a);
+                      setStreet(preset.s);
+                    }}
+                    className="text-[11px] bg-gray-100 hover:bg-[#7D0A0A] dark:bg-gray-800 hover:text-white dark:hover:bg-[#7D0A0A] text-gray-700 dark:text-gray-300 px-2.5 py-1 rounded-full font-semibold transition-all border border-gray-200 dark:border-gray-700"
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+              <div>
+                <label className="font-semibold block mb-1">{t('city_oman')}</label>
+                <select
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="w-full bg-gray-50 dark:bg-gray-800 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 font-bold"
+                >
+                  {omanCities.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="font-semibold block mb-1">{t('area_district')}</label>
+                <input
+                  type="text"
+                  required
+                  value={area}
+                  onChange={(e) => setArea(e.target.value)}
+                  className="w-full bg-gray-50 dark:bg-gray-800 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700"
+                />
+              </div>
+
+              <div>
+                <label className="font-semibold block mb-1">{t('street_address')}</label>
+                <input
+                  type="text"
+                  required
+                  value={street}
+                  onChange={(e) => setStreet(e.target.value)}
+                  className="w-full bg-gray-50 dark:bg-gray-800 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div>
+                <label className="font-semibold block mb-1 flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5 text-[#7D0A0A]" /> {t('select_delivery_date')}
+                </label>
+                <input
+                  type="date"
+                  value={deliveryDate}
+                  onChange={(e) => setDeliveryDate(e.target.value)}
+                  className="w-full bg-gray-50 dark:bg-gray-800 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 font-bold"
+                />
+              </div>
+              <div>
+                <label className="font-semibold block mb-1 flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5 text-[#7D0A0A]" /> {t('select_delivery_time')}
+                </label>
+                <select
+                  value={deliveryTime}
+                  onChange={(e) => setDeliveryTime(e.target.value)}
+                  className="w-full bg-gray-50 dark:bg-gray-800 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 font-bold"
+                >
+                  <option value="10:00 - 13:00 (صباحاً)">{language === 'en' ? '10:00 AM - 1:00 PM (Morning)' : '10:00 - 13:00 (صباحاً)'}</option>
+                  <option value="17:00 - 20:00 (مساءً)">{language === 'en' ? '5:00 PM - 8:00 PM (Evening)' : '17:00 - 20:00 (مساءً)'}</option>
+                  <option value="20:00 - 23:00 (ليلاً)">{language === 'en' ? '8:00 PM - 11:00 PM (Night)' : '20:00 - 23:00 (ليلاً)'}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 3: Payment Methods */}
+          <div className="bg-white dark:bg-[#151111] p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm space-y-4">
+            <h3 className="font-bold font-heading text-base text-gray-900 dark:text-gray-100 flex items-center gap-2">
+              <CreditCard className="w-5 h-5 text-[#7D0A0A] dark:text-[#D4AF37]" />
+              <span>{language === 'en' ? '3. Royal Payment Method' : '٣. طريقة الدفع الفاخرة'}</span>
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[
+                { id: 'apple_pay', title: 'Apple Pay', desc: language === 'en' ? 'Fast & secure one-click checkout' : 'دفع فوري سريع وآمن بنقرة واحدة' },
+                { id: 'thawani', title: 'Thawani Gateway (Oman)', desc: language === 'en' ? 'Direct local Omani digital payment gateway' : 'بوابة الدفع الإلكتروني المباشرة في سلطنة عمان' },
+                { id: 'visa', title: 'Visa / MasterCard', desc: language === 'en' ? 'Encrypted payment with any bank card' : 'دفع آمن مشفر بجميع البطاقات البنكية' },
+                { id: 'cod', title: 'Cash / Card on Delivery', desc: language === 'en' ? 'Pay cash or card upon courier delivery' : 'نقدياً أو بالبطاقة عند وصول المندوب' },
+              ].map((pm) => (
+                <div
+                  key={pm.id}
+                  onClick={() => setPaymentMethod(pm.id as any)}
+                  className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-start gap-3 ${
+                    paymentMethod === pm.id
+                      ? 'border-[#7D0A0A] bg-[#FCECEF]/40 dark:bg-[#7D0A0A]/20'
+                      : 'border-gray-200 dark:border-gray-800'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="pm"
+                    checked={paymentMethod === pm.id}
+                    onChange={() => {}}
+                    className="mt-1 accent-[#7D0A0A]"
+                  />
+                  <div>
+                    <h4 className="font-bold text-sm text-gray-900 dark:text-gray-100">{pm.title}</h4>
+                    <p className="text-[11px] text-gray-500 mt-0.5">{pm.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+
+        {/* Right Col: Summary & Finish */}
+        <div className="space-y-6">
+          <div className="bg-white dark:bg-[#151111] p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-lg space-y-6 sticky top-28">
+            <h3 className="font-heading font-bold text-lg text-gray-900 dark:text-gray-100 border-b border-gray-100 dark:border-gray-800 pb-3">
+              {t('order_summary')}
+            </h3>
+
+            <div className="space-y-3 text-xs text-gray-600 dark:text-gray-300">
+              <div className="flex justify-between">
+                <span>{t('subtotal')}</span>
+                <span className="font-bold text-gray-900 dark:text-gray-100">{formatPrice(cartSubtotal)}</span>
+              </div>
+              {discountAmount > 0 && (
+                <div className="flex justify-between text-emerald-600 font-bold">
+                  <span>{t('discount')}</span>
+                  <span>-{formatPrice(discountAmount)}</span>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span>{t('delivery_fee')}</span>
+                <span className="font-bold text-gray-900 dark:text-gray-100">{formatPrice(deliveryFee)}</span>
+              </div>
+              <div className="flex justify-between text-base font-extrabold text-gray-900 dark:text-gray-100 pt-3 border-t border-gray-100 dark:border-gray-800">
+                <span>{t('grand_total')}</span>
+                <span className="text-xl text-[#7D0A0A] dark:text-[#D4AF37]">{formatPrice(cartTotal)}</span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-[#7D0A0A] hover:bg-[#5A0707] text-white py-3.5 rounded-2xl font-bold text-sm shadow-xl flex items-center justify-center gap-2 border border-[#D4AF37]/50 disabled:opacity-50"
+              >
+                {isSubmitting ? (
+                  <span className="animate-pulse">
+                    {language === 'en' ? 'Processing & Confirming Order...' : 'جاري تأكيد ومعالجة الطلب...'}
+                  </span>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4 text-[#D4AF37]" />
+                    <span>
+                      {language === 'en'
+                        ? `Complete Order Now (${formatPrice(cartTotal)})`
+                        : `تأكيد الطلب الآن (${formatPrice(cartTotal)})`}
+                    </span>
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const itemsList = cart.map(i => `- ${language === 'en' ? i.product.nameEn : i.product.nameAr} (x${i.quantity})`).join('\n');
+                  const msg = encodeURIComponent(
+                    `مرحباً عبق نزوى ✨ أود تأكيد الطلب المباشر:\n\n*المنتجات:*\n${itemsList}\n\n*المبلغ الإجمالي:* ${formatPrice(cartTotal)}\n*اسم العميل:* ${customerName} (${customerPhone})\n*المستلم:* ${isForSomeoneElse ? recipientName : customerName}\n*العنوان:* ${city} - ${area} (${street})\n*تاريخ التوصيل:* ${deliveryDate} (${deliveryTime})`
+                  );
+                  window.open(`https://wa.me/96891234567?text=${msg}`, '_blank');
+                }}
+                className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white py-3 rounded-2xl font-bold text-xs shadow-md flex items-center justify-center gap-2"
+              >
+                <MessageCircle className="w-4 h-4" />
+                <span>{language === 'en' ? 'Quick Confirm via WhatsApp' : 'تأكيد سريع عبر الواتساب 💬'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  );
+};

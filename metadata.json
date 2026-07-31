@@ -1,0 +1,6 @@
+{
+  "name": "عبق نزوى - Abaq Nizwa",
+  "description": "متجر إلكتروني احترافي فاخر لعلامة عبق نزوى متخصص في تنسيق باقات الورد، الشوكولاتة الفاخرة، العطور، وتجهيز هدايا الزواج والمناسبات.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
