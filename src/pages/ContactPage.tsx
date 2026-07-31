@@ -92,35 +92,31 @@ export const ContactPage: React.FC = () => {
           </form>
         </div>
 
-        {/* Showrooms & WhatsApp Direct Info */}
+        {/* Showroom & WhatsApp Direct Info */}
         <div className="space-y-6">
           <div className="bg-[#120D0D] text-white p-6 rounded-3xl border border-[#7D0A0A]/40 shadow-xl space-y-4">
             <h3 className="text-lg font-bold font-heading text-[#D4AF37]">
-              {language === 'en' ? 'Official Flagship Showrooms in Oman' : 'معارضنا الرسمية في سلطنة عمان'}
+              {language === 'en' ? 'Our Official Showroom in Oman' : 'معرضنا الرسمي في سلطنة عمان'}
             </h3>
 
             <div className="space-y-4 text-xs text-gray-300">
-              <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-[#D4AF37] shrink-0" />
+              <div className="flex items-start gap-3 bg-white/5 p-4 rounded-2xl border border-white/10">
+                <MapPin className="w-5 h-5 text-[#D4AF37] shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-bold text-white">{language === 'en' ? 'Muscat Flagship Showroom' : 'معرض مسقط الرئيسي'}</h4>
-                  <p>{language === 'en' ? 'Sultan Qaboos Street, Qurum - Muscat' : 'شارع السلطان قابوس، القرم - مسقط'}</p>
-                  <p className="text-[11px] text-gray-400">{language === 'en' ? 'Hours: 9:00 AM - 10:00 PM' : 'ساعات العمل: 9:00 ص - 10:00 م'}</p>
+                  <h4 className="font-bold text-white text-sm">{language === 'en' ? 'Nizwa Main Showroom (Single Official Branch)' : 'معرض نزوى الرئيسي (الفرع الوحيد)'}</h4>
+                  <p className="mt-1">{language === 'en' ? 'Near Ancient Nizwa Fort - Al Turath Quarter, Nizwa' : 'بالقرب من قلعة نزوى العريقة - حي التراث، ولاية نزوى'}</p>
+                  <p className="text-[11px] text-[#D4AF37] mt-1 font-semibold">{language === 'en' ? 'Hours: 9:00 AM - 10:00 PM (Daily)' : 'ساعات العمل: 9:00 صباحاً - 10:00 مساءً (يومياً)'}</p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-[#D4AF37] shrink-0" />
-                <div>
-                  <h4 className="font-bold text-white">{language === 'en' ? 'Historic Nizwa Showroom' : 'معرض نزوى التاريخي'}</h4>
-                  <p>{language === 'en' ? 'Near Ancient Nizwa Fort - Al Turath Quarter' : 'بالقرب من قلعة نزوى العريقة - حي التراث'}</p>
-                  <p className="text-[11px] text-gray-400">{language === 'en' ? 'Hours: 9:00 AM - 10:00 PM' : 'ساعات العمل: 9:00 ص - 10:00 م'}</p>
-                </div>
+              <div className="p-3 bg-[#7D0A0A]/20 border border-[#D4AF37]/30 rounded-xl text-gray-300 text-xs">
+                <p className="font-semibold text-white mb-0.5">{language === 'en' ? 'Express Delivery Across Oman:' : 'التوصيل السريع لكافة المحافظات:'}</p>
+                <p className="text-gray-400 text-[11px]">{language === 'en' ? 'We ship directly to Muscat, Salalah, Sohar, Sur, and all regions.' : 'نوصل طلباتكم بعناية فائقة إلى مسقط، صلالة، صحار، صور وكافة الولايات.'}</p>
               </div>
 
               <div className="flex items-center gap-3 pt-2">
                 <Phone className="w-5 h-5 text-[#D4AF37]" />
-                <span>{language === 'en' ? 'Direct Support: +968 24123456 / +968 91234567' : 'الهاتف المباشر: +968 24123456 / +968 91234567'}</span>
+                <span>{language === 'en' ? 'Direct Support: +968 91234567' : 'الهاتف المباشر للدعم: +968 91234567'}</span>
               </div>
             </div>
 

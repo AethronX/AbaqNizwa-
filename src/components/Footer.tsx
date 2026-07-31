@@ -169,25 +169,21 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab }) => {
             </ul>
           </div>
 
-          {/* Showrooms Info */}
+          {/* Showroom Info */}
           <div>
             <h3 className="text-white font-bold text-base mb-4 border-r-2 ltr:border-r-0 ltr:border-l-2 border-[#D4AF37] pr-3 ltr:pr-0 ltr:pl-3 font-heading">
-              {language === 'en' ? 'Our Showrooms' : 'معارضنا في سلطنة عمان'}
+              {language === 'en' ? 'Our Showroom' : 'معرضنا في سلطنة عمان'}
             </h3>
             <div className="space-y-3 text-xs text-gray-300">
               <div className="flex items-start gap-2 bg-white/5 p-3 rounded-xl border border-white/5">
                 <MapPin className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-bold text-white text-xs">{language === 'en' ? 'Muscat Showroom' : 'معرض مسقط'}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">{language === 'en' ? 'Sultan Qaboos St, Qurum' : 'شارع السلطان قابوس، القرم'}</p>
+                  <p className="font-bold text-white text-xs">{language === 'en' ? 'Nizwa Main Showroom (Single Branch)' : 'معرض نزوى الرئيسي (الفرع الوحيد)'}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{language === 'en' ? 'Near Historic Nizwa Fort - Al Turath Quarter' : 'بالقرب من قلعة نزوى العريقة - حي التراث'}</p>
                 </div>
               </div>
-              <div className="flex items-start gap-2 bg-white/5 p-3 rounded-xl border border-white/5">
-                <MapPin className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-bold text-white text-xs">{language === 'en' ? 'Nizwa Showroom' : 'معرض نزوى'}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">{language === 'en' ? 'Near Historic Nizwa Fort' : 'بالقرب من قلعة نزوى العريقة'}</p>
-                </div>
+              <div className="p-2.5 bg-white/5 rounded-xl border border-white/5 text-[11px] text-[#D4AF37]">
+                <span>{language === 'en' ? '🚀 Express delivery across all regions of Oman' : '🚀 خدمة التوصيل السريع لجميع مناطق ومحافظات سلطنة عمان'}</span>
               </div>
             </div>
           </div>

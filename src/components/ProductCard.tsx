@@ -10,7 +10,7 @@ interface ProductCardProps {
   onQuickView?: (product: Product) => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({
+export const ProductCardComponent: React.FC<ProductCardProps> = ({
   product,
   onSelectProduct,
   onQuickView,
@@ -54,6 +54,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <img
           src={imgSrc || fallbackImg}
           alt={title}
+          loading="lazy"
+          decoding="async"
           referrerPolicy="no-referrer"
           onError={() => setImgSrc(fallbackImg)}
           className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
@@ -166,3 +168,5 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     </div>
   );
 };
+
+export const ProductCard = React.memo(ProductCardComponent);

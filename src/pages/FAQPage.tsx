@@ -14,10 +14,16 @@ export const FAQPage: React.FC = () => {
       aEn: 'All Abaq Nizwa arrangements are delivered in temperature-controlled refrigerated vehicles (4-8°C). Stems are hydrated with water-nutrient capsules ensuring optimal freshness.'
     },
     {
-      qAr: 'هل يمكن التوصيل في نفس اليوم داخل مسقط ونزوى؟',
-      qEn: 'Is same-day express delivery available in Muscat & Nizwa?',
-      aAr: 'نعم! تتوفر خدمة التوصيل السريع في نفس اليوم للطلبات المؤكدة قبل الساعة 4:00 عصراً داخل محافظات مسقط ونزوى والداخلية والصحار.',
-      aEn: 'Yes! Same-day express delivery is available for orders confirmed before 4:00 PM across Muscat, Nizwa, Ad Dakhiliyah, and Sohar.'
+      qAr: 'أين يقع معرض عبق نزوى؟ وهل توجد فروع أخرى؟',
+      qEn: 'Where is Abaq Nizwa store located? Are there other branches?',
+      aAr: 'يقع معرضنا الرئيسي والوحيد في ولاية نزوى التاريخية بالقرب من قلعة نزوى العريقة (حي التراث). ويوفر متجرنا الإلكتروني خدمة التوصيل السريع لجميع الولايات ومحافظات سلطنة عمان.',
+      aEn: 'Our single official flagship showroom is located in historic Nizwa near Nizwa Fort (Al Turath Quarter). Our online store provides express delivery across all governorates in Oman.'
+    },
+    {
+      qAr: 'هل يمكن التوصيل في نفس اليوم لجميع محافظات سلطنة عمان؟',
+      qEn: 'Is same-day express delivery available across Oman?',
+      aAr: 'نعم! تتوفر خدمة التوصيل السريع بنفس اليوم للطلبات المؤكدة قبل الساعة 4:00 عصراً لكافة المحافظات بما فيها مسقط، نزوى، صحار، صلالة، وصور.',
+      aEn: 'Yes! Same-day express delivery is available for orders confirmed before 4:00 PM across Muscat, Nizwa, Ad Dakhiliyah, Sohar, and all regions.'
     },
     {
       qAr: 'هل تتوفر سرية تامة ومفاجأة للمستلم عند الهدايا؟',
