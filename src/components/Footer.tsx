@@ -2,7 +2,6 @@ import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useStore } from '../context/StoreContext';
 import {
-  Flower2,
   Instagram,
   Phone,
   Mail,
@@ -10,6 +9,7 @@ import {
   Heart,
   MessageCircle
 } from 'lucide-react';
+import logo from '../assets/logo-abaq-nizwa.png';
 
 interface FooterProps {
   setActiveTab: (tab: string) => void;
@@ -33,12 +33,20 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab }) => {
           {/* Brand Col */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#7D0A0A] text-[#D4AF37] flex items-center justify-center shadow-inner">
-                <Flower2 className="w-5 h-5" />
-              </div>
-              <span className="font-heading font-bold text-2xl text-white tracking-wide">
-                {language === 'en' ? 'Abaq Nizwa' : 'عبق نزوى'}
-              </span>
+              <img
+                src={logo}
+                alt="عبق نزوى - Abaq Nizwa"
+                width={429}
+                height={400}
+                loading="lazy"
+                decoding="async"
+                className="h-11 w-auto shrink-0"
+              />
+              {language === 'en' && (
+                <span className="font-heading font-bold text-2xl text-white tracking-wide">
+                  Abaq Nizwa
+                </span>
+              )}
             </div>
             <p className="text-sm text-gray-400 leading-relaxed">
               {t('footer_about_text')}
