@@ -11,8 +11,8 @@ import {
   Moon,
   Globe,
   Sparkles,
-  Flower2,
 } from 'lucide-react';
+import logo from '../assets/logo-abaq-nizwa.png';
 
 interface NavbarProps {
   activeTab: string;
@@ -120,17 +120,17 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
             onClick={() => handleNavClick('home')}
             className="flex items-center gap-2 sm:gap-3 text-right focus:outline-none group shrink-0"
           >
-            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#7D0A0A] text-[#D4AF37] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform border border-[#D4AF37]/30 shrink-0">
-              <Flower2 className="w-5 h-5 sm:w-6 sm:h-6" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-heading font-bold text-lg sm:text-2xl tracking-wide text-[#7D0A0A] dark:text-[#F3F3F3] leading-none whitespace-nowrap">
-                عبق نزوى
-              </span>
-              <span className="hidden sm:inline-block text-[10px] tracking-widest text-[#8C6914] dark:text-[#D4AF37] uppercase font-serif-accent mt-0.5">
-                Abaq Nizwa • Oman
-              </span>
-            </div>
+            <img
+              src={logo}
+              alt="عبق نزوى - Abaq Nizwa"
+              width={429}
+              height={400}
+              fetchPriority="high"
+              className="h-10 sm:h-12 w-auto shrink-0 group-hover:scale-105 transition-transform"
+            />
+            <span className="hidden sm:inline-block text-[10px] tracking-widest text-[#8C6914] dark:text-[#D4AF37] uppercase font-serif-accent">
+              Abaq Nizwa • Oman
+            </span>
           </button>
 
           {/* Desktop Primary Nav */}
