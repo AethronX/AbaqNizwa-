@@ -234,7 +234,7 @@ export const CartPage: React.FC<CartPageProps> = ({ setActiveTab, onProceedCheck
               </div>
 
               {discountAmount > 0 && (
-                <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-bold">
+                <div className="flex justify-between text-emerald-700 dark:text-emerald-400 font-bold">
                   <span>{t('discount')}</span>
                   <span>-{formatPrice(discountAmount)}</span>
                 </div>

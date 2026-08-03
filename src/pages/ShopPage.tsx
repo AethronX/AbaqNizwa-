@@ -170,7 +170,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onSelectProduct }) => {
                   }`}
                 >
                   <span>{language === 'en' ? cat.nameEn : cat.nameAr}</span>
-                  <span className="text-[10px] opacity-70">({cat.itemCount})</span>
+                  <span className={`text-[10px] ${selectedCategoryFilter === cat.id ? 'text-white/80' : 'text-gray-500 dark:text-gray-400'}`}>({cat.itemCount})</span>
                 </button>
               ))}
             </div>
@@ -344,7 +344,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onSelectProduct }) => {
                       }`}
                     >
                       <span>{cat.nameAr}</span>
-                      <span className="text-[10px] opacity-70">({cat.itemCount})</span>
+                      <span className={`text-[10px] ${selectedCategoryFilter === cat.id ? 'text-white/80' : 'text-gray-500 dark:text-gray-400'}`}>({cat.itemCount})</span>
                     </button>
                   ))}
                 </div>

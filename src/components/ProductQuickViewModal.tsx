@@ -106,12 +106,12 @@ export const ProductQuickViewModal: React.FC<ProductQuickViewModalProps> = ({
           {/* Details */}
           <div className="space-y-4 flex flex-col justify-between">
             <div>
-              <div className="flex items-center gap-2 text-xs text-amber-500 font-bold mb-1">
+              <div className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-500 font-bold mb-1">
                 <div className="flex items-center">
                   <Star className="w-4 h-4 fill-amber-400" />
                   <span className="mr-1">{product.rating}</span>
                 </div>
-                <span className="text-gray-400">({product.reviewsCount} تقييم)</span>
+                <span className="text-gray-500 dark:text-gray-400">({product.reviewsCount} تقييم)</span>
               </div>
 
               <h2 className="text-xl font-bold font-heading text-gray-900 dark:text-gray-100">
@@ -123,7 +123,7 @@ export const ProductQuickViewModal: React.FC<ProductQuickViewModalProps> = ({
                   {formatPrice(product.price * quantity)}
                 </span>
                 {product.originalPrice && (
-                  <span className="text-sm text-gray-400 line-through">
+                  <span className="text-sm text-gray-500 dark:text-gray-400 line-through">
                     {formatPrice(product.originalPrice * quantity)}
                   </span>
                 )}
