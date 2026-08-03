@@ -2,6 +2,27 @@
 
 @variant dark (&:where(.dark, .dark *));
 
+@theme {
+  --animate-fadeIn: fadeIn 0.35s ease-out both;
+  --animate-slideUp: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(-16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fadeIn, .animate-slideUp {
+    animation-duration: 0.001ms !important;
+  }
+}
+
 html, body, #root {
   overflow-x: hidden;
   max-width: 100vw;

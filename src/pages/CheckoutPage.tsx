@@ -17,18 +17,44 @@ interface CheckoutPageProps {
   onBackToCart: () => void;
 }
 
+// Remembers sender + address details after a successful order so repeat
+// customers don't have to retype everything on their next visit.
+const SAVED_INFO_KEY = 'abaq_saved_checkout_info';
+
+interface SavedCheckoutInfo {
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  city: string;
+  area: string;
+  street: string;
+  building: string;
+}
+
+const loadSavedInfo = (): Partial<SavedCheckoutInfo> => {
+  try {
+    const raw = localStorage.getItem(SAVED_INFO_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+};
+
 export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, onBackToCart }) => {
   const { cart, cartSubtotal, discountAmount, deliveryFee, cartTotal, formatPrice, createOrder, appliedCoupon } = useStore();
   const { t, language } = useLanguage();
 
-  const [customerName, setCustomerName] = useState('');
-  const [customerPhone, setCustomerPhone] = useState('');
-  const [customerEmail, setCustomerEmail] = useState('');
+  const savedInfo = React.useMemo(loadSavedInfo, []);
+  const isReturningCustomer = Object.keys(savedInfo).length > 0;
 
-  const [city, setCity] = useState('');
-  const [area, setArea] = useState('');
-  const [street, setStreet] = useState('');
-  const [building, setBuilding] = useState('');
+  const [customerName, setCustomerName] = useState(savedInfo.customerName || '');
+  const [customerPhone, setCustomerPhone] = useState(savedInfo.customerPhone || '');
+  const [customerEmail, setCustomerEmail] = useState(savedInfo.customerEmail || '');
+
+  const [city, setCity] = useState(savedInfo.city || '');
+  const [area, setArea] = useState(savedInfo.area || '');
+  const [street, setStreet] = useState(savedInfo.street || '');
+  const [building, setBuilding] = useState(savedInfo.building || '');
   const [notes, setNotes] = useState('');
 
   const [isForSomeoneElse, setIsForSomeoneElse] = useState(false);
@@ -86,6 +112,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, on
       total: cartTotal,
       couponCode: appliedCoupon?.code,
     });
+
+    const infoToSave: SavedCheckoutInfo = { customerName, customerPhone, customerEmail, city, area, street, building };
+    localStorage.setItem(SAVED_INFO_KEY, JSON.stringify(infoToSave));
 
     window.open(buildWhatsAppUrl(), '_blank');
     setOrderSent(true);
@@ -168,6 +197,14 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, on
               ? 'Enter delivery details and recipient address — we\'ll prepare a WhatsApp message for you to send our team'
               : 'أدخل تفاصيل التوصيل وعنوان المستلم، وسنجهز لك رسالة واتساب لإرسالها لفريقنا'}
           </p>
+          {isReturningCustomer && (
+            <p className="text-[11px] text-emerald-700 dark:text-emerald-400 font-bold mt-1.5 inline-flex items-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              {language === 'en'
+                ? 'Welcome back! We filled in your details from last time — feel free to edit anything.'
+                : 'أهلاً بعودتك! عبّأنا بياناتك من طلبك السابق — عدّل أي شيء تحتاجه.'}
+            </p>
+          )}
         </div>
       </div>
 

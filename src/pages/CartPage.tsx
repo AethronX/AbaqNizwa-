@@ -192,8 +192,14 @@ export const CartPage: React.FC<CartPageProps> = ({ setActiveTab, onProceedCheck
               {t('order_summary')}
             </h3>
 
+            {/* Subtotal */}
+            <div className="flex justify-between text-xs text-gray-600 dark:text-gray-300">
+              <span>{t('subtotal')}</span>
+              <span className="font-bold text-gray-900 dark:text-gray-100">{formatPrice(cartSubtotal)}</span>
+            </div>
+
             {/* Coupon Code Form */}
-            <form onSubmit={handleApplyCoupon} className="space-y-2">
+            <form onSubmit={handleApplyCoupon} className="space-y-2 pt-2 border-t border-gray-100 dark:border-gray-800">
               <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block">
                 {language === 'en' ? 'Royal Promo Code:' : 'كود الخصم الملكي:'}
               </label>
@@ -228,11 +234,6 @@ export const CartPage: React.FC<CartPageProps> = ({ setActiveTab, onProceedCheck
 
             {/* Price Calculations */}
             <div className="space-y-3 text-xs text-gray-600 dark:text-gray-300 pt-2 border-t border-gray-100 dark:border-gray-800">
-              <div className="flex justify-between">
-                <span>{t('subtotal')}</span>
-                <span className="font-bold text-gray-900 dark:text-gray-100">{formatPrice(cartSubtotal)}</span>
-              </div>
-
               {discountAmount > 0 && (
                 <div className="flex justify-between text-emerald-700 dark:text-emerald-400 font-bold">
                   <span>{t('discount')}</span>
