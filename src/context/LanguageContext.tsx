@@ -43,15 +43,12 @@ const translations: Record<string, { ar: string; en: string }> = {
   currency_omr: { ar: 'ر.ع.', en: 'OMR' },
   currency_sar: { ar: 'ر.س', en: 'SAR' },
   currency_usd: { ar: '$', en: 'USD' },
-  reviews: { ar: 'تقييمات', en: 'Reviews' },
 
   // Occasions
   occasions_title: { ar: 'هدايا لكافة المناسبات', en: 'Gifts for Every Occasion' },
   occasions_subtitle: { ar: 'اجعل كل لحظة تتألق بالورد والشوكولاتة والعطور الفاخرة', en: 'Make every memory bloom with fine flowers, chocolates & perfumes' },
 
-  // Reviews & Social
-  reviews_title: { ar: 'ماذا يقول عملاؤنا', en: 'What Our Clients Say' },
-  reviews_subtitle: { ar: 'تجارب حقيقية لعملاء وثقوا بلغة جمال عبق نزوى', en: 'Authentic testimonials from clients who experienced Abaq Nizwa' },
+  // Social
   instagram_title: { ar: 'تابعونا على إنستغرام', en: 'Follow Us on Instagram' },
   instagram_handle: { ar: '@abaq_nizwa', en: '@abaq_nizwa' },
 

@@ -113,8 +113,6 @@ export const CustomGiftStudio: React.FC<CustomGiftStudioProps> = ({ onGoToCart }
       descriptionEn: `Bespoke custom gift designed by client with personalized card message.`,
       price: grandTotal,
       category: 'custom-design',
-      rating: 5.0,
-      reviewsCount: 1,
       images: [selectedBase.image],
       inStock: true,
       stockQuantity: 99,

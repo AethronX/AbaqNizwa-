@@ -1,4 +1,4 @@
-import { Product, Category, Occasion, Review, Coupon, Banner, Customer, Order } from '../types';
+import { Product, Category, Occasion, Coupon, Banner, Customer, Order } from '../types';
 import heroImg from '../assets/images/nizwa_hero_banner_1785404588402.jpg';
 import perfumeImg from '../assets/images/niche_perfume_bottle_1785404603274.jpg';
 import chocolatesImg from '../assets/images/luxury_chocolate_box_1785404617822.jpg';
@@ -159,8 +159,6 @@ export const PRODUCTS: Product[] = [
     originalPrice: 55.00,
     category: 'bouquets',
     occasionId: 'wedding',
-    rating: 4.9,
-    reviewsCount: 42,
     images: [
       heroImg,
       'https://images.unsplash.com/photo-1561181286-d3fee7d55364?auto=format&fit=crop&w=800&q=80',
@@ -195,8 +193,6 @@ export const PRODUCTS: Product[] = [
     originalPrice: 78.00,
     category: 'perfumes',
     occasionId: 'thank-you',
-    rating: 5.0,
-    reviewsCount: 38,
     images: [
       perfumeImg,
       'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=800&q=80'
@@ -218,8 +214,6 @@ export const PRODUCTS: Product[] = [
     originalPrice: 38.00,
     category: 'chocolates',
     occasionId: 'engagement',
-    rating: 4.8,
-    reviewsCount: 29,
     images: [
       chocolatesImg,
       'https://images.unsplash.com/photo-1548848221-0c2e497ed557?auto=format&fit=crop&w=800&q=80'
@@ -241,8 +235,6 @@ export const PRODUCTS: Product[] = [
     originalPrice: 145.00,
     category: 'wedding',
     occasionId: 'wedding',
-    rating: 5.0,
-    reviewsCount: 19,
     images: [
       weddingImg,
       heroImg
@@ -264,8 +256,6 @@ export const PRODUCTS: Product[] = [
     originalPrice: 65.00,
     category: 'graduation',
     occasionId: 'graduation',
-    rating: 4.9,
-    reviewsCount: 31,
     images: [
       gradImg,
       chocolatesImg,
@@ -288,8 +278,6 @@ export const PRODUCTS: Product[] = [
     originalPrice: 95.00,
     category: 'bouquets',
     occasionId: 'thank-you',
-    rating: 4.9,
-    reviewsCount: 22,
     images: [
       bouquetImg,
       heroImg
@@ -309,8 +297,6 @@ export const PRODUCTS: Product[] = [
     originalPrice: 55.00,
     category: 'baby',
     occasionId: 'baby',
-    rating: 4.7,
-    reviewsCount: 16,
     images: [
       babyImg,
       chocolatesImg
@@ -330,8 +316,6 @@ export const PRODUCTS: Product[] = [
     originalPrice: 160.00,
     category: 'luxury-gifts',
     occasionId: 'wedding',
-    rating: 5.0,
-    reviewsCount: 54,
     images: [
       heroImg,
       perfumeImg,
@@ -344,57 +328,6 @@ export const PRODUCTS: Product[] = [
     stockQuantity: 8,
     tagsAr: ['طقم ملكي', 'هدايا كبار الشخصيات', 'VIP'],
     tagsEn: ['Royal Set', 'VIP Gift', 'Heritage'],
-  }
-];
-
-export const REVIEWS: Review[] = [
-  {
-    id: 'rev-1',
-    productId: 'abaq-royal-red',
-    productNameAr: 'باقة عبق الملكية - البرغندي والذهب',
-    productNameEn: 'Abaq Royal Burgundy & Gold Bouquet',
-    userName: 'شيخة البوسعيدية',
-    rating: 5,
-    comment: 'ما شاء الله تعامل راقي وتنسيق الورد يجمد العين! الورد وصل فريش وريحة العطر والتغليف البرغندي والذهبي شيء خيالي. شكراً عبق نزوى.',
-    date: '2026-07-20',
-    verified: true,
-    city: 'مسقط',
-  },
-  {
-    id: 'rev-2',
-    productId: 'nizwa-frankincense-perfume',
-    productNameAr: 'عطر عبق نزوى - اللبان والعنبر الملكي',
-    productNameEn: 'Abaq Nizwa Royal Amber & Frankincense',
-    userName: 'د. خالد الكندي',
-    rating: 5,
-    comment: 'عطر اللبان والعنبر ثباته عجيب وفوحانه مميز جداً، كل حد يسألني عن ريحته في المجلس. توصيل سريع ومغلف ببطاقة إهداء فاخرة.',
-    date: '2026-07-18',
-    verified: true,
-    city: 'نزوى',
-  },
-  {
-    id: 'rev-3',
-    productId: 'gold-truffles-box',
-    productNameAr: 'صندوق شوكولاتة عبق نزوى المذهبة',
-    productNameEn: 'Abaq Nizwa Gold Leaf Truffles Box',
-    userName: 'مريم العبرية',
-    rating: 5,
-    comment: 'طعم الشوكولاتة البلجيكية غني ولذيذ، والتغليف بالذهب عيار 24 بيّض وجهي في مناسبة ملكة أختي. حتماً سأكرر الطلب.',
-    date: '2026-07-15',
-    verified: true,
-    city: 'صحار',
-  },
-  {
-    id: 'rev-4',
-    productId: 'wedding-mahr-tray',
-    productNameAr: 'صينية المهر الملكية',
-    productNameEn: 'Royal Mahr Crystal Tray',
-    userName: 'المهندس أحمد الريامي',
-    rating: 5,
-    comment: 'طلبنا صينية المهر مع التعديلات المخصصة وكان التنفيذ فوق التوقعات. الشغل نظيف والورد متناسق والدقة عالية جداً.',
-    date: '2026-07-10',
-    verified: true,
-    city: 'صلالة',
   }
 ];
 

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Product, CartItem, Order, Coupon, Review, Customer, OrderStatus } from '../types';
-import { PRODUCTS as initialProducts, REVIEWS as initialReviews, COUPONS as initialCoupons, INITIAL_ORDERS, MOCK_CUSTOMERS } from '../data/mockData';
+import { Product, CartItem, Order, Coupon, Customer, OrderStatus } from '../types';
+import { PRODUCTS as initialProducts, COUPONS as initialCoupons, INITIAL_ORDERS, MOCK_CUSTOMERS } from '../data/mockData';
 
 export type Currency = 'OMR' | 'SAR' | 'USD';
 
@@ -30,13 +30,11 @@ interface StoreContextType {
   orders: Order[];
   createOrder: (orderData: Omit<Order, 'id' | 'orderNumber' | 'date' | 'status' | 'trackingTimeline'>) => Order;
   updateOrderStatus: (orderId: string, status: OrderStatus) => void;
-  reviews: Review[];
-  addReview: (review: Omit<Review, 'id' | 'date' | 'verified'>) => void;
   coupons: Coupon[];
   addCoupon: (coupon: Omit<Coupon, 'id' | 'usageCount'>) => void;
   deleteCoupon: (id: string) => void;
   customers: Customer[];
-  addProduct: (product: Omit<Product, 'id' | 'rating' | 'reviewsCount'>) => void;
+  addProduct: (product: Omit<Product, 'id'>) => void;
   updateProduct: (product: Product) => void;
   deleteProduct: (id: string) => void;
   toasts: Toast[];
@@ -77,11 +75,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
 
-  const [reviews, setReviews] = useState<Review[]>(() => {
-    const saved = localStorage.getItem('abaq_reviews');
-    return saved ? JSON.parse(saved) : initialReviews;
-  });
-
   const [customers] = useState<Customer[]>(MOCK_CUSTOMERS);
   const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -101,10 +94,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     localStorage.setItem('abaq_orders', JSON.stringify(orders));
   }, [orders]);
-
-  useEffect(() => {
-    localStorage.setItem('abaq_reviews', JSON.stringify(reviews));
-  }, [reviews]);
 
   useEffect(() => {
     localStorage.setItem('abaq_coupons', JSON.stringify(coupons));
@@ -245,17 +234,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     showToast('تم تحديث حالة الطلب بنجاح');
   };
 
-  const addReview = (reviewData: Omit<Review, 'id' | 'date' | 'verified'>) => {
-    const newRev: Review = {
-      ...reviewData,
-      id: `rev-${Date.now()}`,
-      date: new Date().toISOString().substring(0, 10),
-      verified: true,
-    };
-    setReviews((prev) => [newRev, ...prev]);
-    showToast('شكراً لمشاركتك تقييمك الفاخر! ⭐');
-  };
-
   const addCoupon = (couponData: Omit<Coupon, 'id' | 'usageCount'>) => {
     const newCoupon: Coupon = {
       ...couponData,
@@ -271,12 +249,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     showToast('تم حذف كود الخصم', 'info');
   };
 
-  const addProduct = (p: Omit<Product, 'id' | 'rating' | 'reviewsCount'>) => {
+  const addProduct = (p: Omit<Product, 'id'>) => {
     const newP: Product = {
       ...p,
       id: `p-${Date.now()}`,
-      rating: 5.0,
-      reviewsCount: 1,
     };
     setProducts((prev) => [newP, ...prev]);
     showToast('تمت إضافة المنتج الجديد بنجاح ✨');
@@ -314,8 +290,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         orders,
         createOrder,
         updateOrderStatus,
-        reviews,
-        addReview,
         coupons,
         addCoupon,
         deleteCoupon,

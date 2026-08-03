@@ -16,7 +16,6 @@ import {
   Truck,
   Sparkles,
   DollarSign,
-  Star,
   Image,
   Layers
 } from 'lucide-react';
@@ -30,12 +29,11 @@ export const AdminDashboard: React.FC = () => {
     updateOrderStatus,
     deleteProduct,
     addProduct,
-    reviews
   } = useStore();
 
   const { t, language } = useLanguage();
 
-  const [activeTab, setActiveTab] = useState<'kpis' | 'products' | 'orders' | 'coupons' | 'reviews'>('kpis');
+  const [activeTab, setActiveTab] = useState<'kpis' | 'products' | 'orders' | 'coupons'>('kpis');
 
   // New Product Modal state
   const [showAddProductModal, setShowAddProductModal] = useState(false);
@@ -63,10 +61,10 @@ export const AdminDashboard: React.FC = () => {
       category: newProdCategory,
       images: [newProdImage],
       inStock: true,
-      rating: 5.0,
-      reviewsCount: 1,
+      stockQuantity: 50,
       isFeatured: true,
-      tagsAr: ['جديد', 'فاخر']
+      tagsAr: ['جديد', 'فاخر'],
+      tagsEn: ['New', 'Luxury']
     });
 
     setNewProdNameAr('');
@@ -106,7 +104,6 @@ export const AdminDashboard: React.FC = () => {
           { id: 'orders', label: language === 'en' ? `Orders (${orders.length})` : `إدارة الطلبات (${orders.length})`, icon: ShoppingBag },
           { id: 'products', label: language === 'en' ? `Inventory (${products.length})` : `المخزون والمنتجات (${products.length})`, icon: Package },
           { id: 'coupons', label: language === 'en' ? `Promo Codes (${coupons.length})` : `أكواد الخصم (${coupons.length})`, icon: Tag },
-          { id: 'reviews', label: language === 'en' ? `Reviews (${reviews.length})` : `التقييمات (${reviews.length})`, icon: Star },
         ].map((tab) => {
           const Icon = tab.icon;
           return (
@@ -289,27 +286,6 @@ export const AdminDashboard: React.FC = () => {
                 </span>
                 <p className="text-xs text-gray-700 dark:text-gray-300 font-bold">{language === 'en' ? 'Discount:' : 'خصم بنسبة:'} {c.discountPercent}%</p>
                 <p className="text-[11px] text-gray-500">{language === 'en' ? c.descriptionEn : c.descriptionAr}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* TAB 5: REVIEWS */}
-      {activeTab === 'reviews' && (
-        <div className="bg-white dark:bg-[#151111] p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm space-y-6">
-          <h3 className="font-bold text-lg font-heading text-gray-900 dark:text-gray-100">
-            {language === 'en' ? 'Approved Customer Reviews' : 'مراجعات وتقييمات العملاء المعتمدة'}
-          </h3>
-          <div className="space-y-3">
-            {reviews.map((r) => (
-              <div key={r.id} className="p-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/40 text-xs space-y-1">
-                <div className="flex justify-between items-center font-bold">
-                  <span>{r.userName} ({r.city})</span>
-                  <span className="text-amber-700 dark:text-amber-500">★ {r.rating}</span>
-                </div>
-                <p className="text-gray-600 dark:text-gray-300">"{r.comment}"</p>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400 block">{r.date}</span>
               </div>
             ))}
           </div>

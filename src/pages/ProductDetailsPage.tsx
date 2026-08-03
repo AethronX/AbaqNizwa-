@@ -4,7 +4,6 @@ import { useStore } from '../context/StoreContext';
 import { useLanguage } from '../context/LanguageContext';
 import { ProductCard } from '../components/ProductCard';
 import {
-  Star,
   ShoppingBag,
   Truck,
   ShieldCheck,
@@ -13,7 +12,6 @@ import {
   Sparkles,
   ArrowRight,
   ArrowLeft,
-  MessageSquare,
   MessageCircle,
   Send,
   UserCheck
@@ -38,8 +36,6 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
     formatPrice,
     addToCart,
     products,
-    reviews,
-    addReview,
   } = useStore();
 
   const [selectedImgIndex, setSelectedImgIndex] = useState(0);
@@ -63,17 +59,8 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
   );
   const [deliveryTime, setDeliveryTime] = useState('17:00 - 20:00 (مساءً)');
 
-  // Review modal
-  const [showReviewModal, setShowReviewModal] = useState(false);
-  const [newRating, setNewRating] = useState(5);
-  const [newComment, setNewComment] = useState('');
-  const [reviewerName, setReviewerName] = useState('');
-
   const title = language === 'ar' ? product.nameAr : product.nameEn;
   const description = language === 'ar' ? product.descriptionAr : product.descriptionEn;
-
-  // Filter product reviews
-  const productReviews = reviews.filter((r) => r.productId === product.id);
 
   // Related products
   const relatedProducts = products
@@ -105,23 +92,6 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
       `مرحباً متجر عبق نزوى ✨ أود طلب هذا المنتج مباشرة:\n- المنتج: ${title}\n- السعر: ${formatPrice(product.price * quantity)}\n- الكمية: ${quantity}\n- التغليف: ${selectedWrapping || 'ملكي'}\n- رسالة الإهداء: ${cardMessage || 'لا يوجد'}\n- اسم المستلم: ${recipientName || 'نفسي'}`
     );
     window.open(`https://wa.me/96891234567?text=${text}`, '_blank');
-  };
-
-  const handleSubmitReview = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!reviewerName || !newComment) return;
-    addReview({
-      productId: product.id,
-      productNameAr: product.nameAr,
-      productNameEn: product.nameEn,
-      userName: reviewerName,
-      rating: newRating,
-      comment: newComment,
-      city: 'مسقط',
-    });
-    setNewComment('');
-    setReviewerName('');
-    setShowReviewModal(false);
   };
 
   const currentImg = product.images[selectedImgIndex] || product.images[0] || fallbackImg;
@@ -191,17 +161,10 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
         <div className="space-y-6">
           
           <div>
-            <div className="flex items-center justify-between text-xs mb-2">
+            <div className="flex items-center text-xs mb-2">
               <span className="text-[#8C6914] dark:text-[#D4AF37] font-bold uppercase tracking-wider">
                 {product.category}
               </span>
-              <div className="flex items-center gap-1 text-amber-700 dark:text-amber-500 font-bold">
-                <Star className="w-4 h-4 fill-amber-400" />
-                <span>{product.rating}</span>
-                <span className="text-gray-500 dark:text-gray-400 text-[11px]">
-                  ({product.reviewsCount} {language === 'en' ? 'customer reviews' : 'تقييم عملاء'})
-                </span>
-              </div>
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-gray-900 dark:text-gray-100">
@@ -438,59 +401,6 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
         </div>
       </div>
 
-      {/* REVIEWS SECTION */}
-      <div className="bg-white dark:bg-[#151111] p-8 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-bold font-heading text-gray-900 dark:text-gray-100">
-              {language === 'en'
-                ? `Customer Reviews (${productReviews.length})`
-                : `تقييمات العملاء لهذا المنتج (${productReviews.length})`}
-            </h2>
-            <p className="text-xs text-gray-500">
-              {language === 'en'
-                ? 'Authentic feedback from customers who ordered this arrangement'
-                : 'تجارب حقيقية لعملاء تسوقوا هذا التنسيق'}
-            </p>
-          </div>
-          <button
-            onClick={() => setShowReviewModal(true)}
-            className="bg-[#7D0A0A] text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5"
-          >
-            <MessageSquare className="w-4 h-4 text-[#D4AF37]" />
-            <span>{language === 'en' ? 'Write a Review' : 'كتابة تقييم'}</span>
-          </button>
-        </div>
-
-        {productReviews.length === 0 ? (
-          <p className="text-xs text-gray-500 italic py-4">
-            {language === 'en'
-              ? 'No reviews yet for this product. Be the first to share your experience!'
-              : 'لا توجد تقييمات مكتوبة لهذا المنتج بعد. كن أول من يشارك تجربته!'}
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {productReviews.map((rev) => (
-              <div
-                key={rev.id}
-                className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl space-y-2 border border-gray-100 dark:border-gray-700"
-              >
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-gray-900 dark:text-gray-100">{rev.userName}</span>
-                  <div className="flex text-amber-400">
-                    {[...Array(rev.rating)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-amber-400" />
-                    ))}
-                  </div>
-                </div>
-                <p className="text-xs text-gray-600 dark:text-gray-300">{rev.comment}</p>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400 block">{rev.date} • {rev.city}</span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
       {/* RELATED PRODUCTS */}
       {relatedProducts.length > 0 && (
         <div className="space-y-6">
@@ -501,74 +411,6 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
             {relatedProducts.map((p) => (
               <ProductCard key={p.id} product={p} onSelectProduct={onSelectProduct} />
             ))}
-          </div>
-        </div>
-      )}
-
-      {/* Review Modal */}
-      {showReviewModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="bg-white dark:bg-[#151111] p-6 rounded-2xl max-w-md w-full space-y-4 border border-[#7D0A0A]/30">
-            <h3 className="font-bold text-lg font-heading text-gray-900 dark:text-gray-100">
-              إضافة تقييم جديد
-            </h3>
-            <form onSubmit={handleSubmitReview} className="space-y-3 text-xs">
-              <div>
-                <label className="font-semibold block mb-1">اسمك الكامل:</label>
-                <input
-                  type="text"
-                  required
-                  value={reviewerName}
-                  onChange={(e) => setReviewerName(e.target.value)}
-                  placeholder="أدخل اسمك الكريم..."
-                  className="w-full p-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"
-                />
-              </div>
-
-              <div>
-                <label className="font-semibold block mb-1">التقييم بالنجوم:</label>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      type="button"
-                      key={star}
-                      onClick={() => setNewRating(star)}
-                      className="p-1 text-amber-400"
-                    >
-                      <Star className={`w-6 h-6 ${newRating >= star ? 'fill-amber-400' : ''}`} />
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="font-semibold block mb-1">رأيك بالتفصيل:</label>
-                <textarea
-                  required
-                  rows={3}
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="اكتب انطباعك عن جودة الورد والتنسيق..."
-                  className="w-full p-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowReviewModal(false)}
-                  className="px-4 py-2 rounded-xl text-gray-600 hover:bg-gray-100"
-                >
-                  إلغاء
-                </button>
-                <button
-                  type="submit"
-                  className="bg-[#7D0A0A] text-white px-5 py-2 rounded-xl font-bold shadow-md"
-                >
-                  نشر التقييم
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}
