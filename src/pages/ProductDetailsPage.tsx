@@ -206,13 +206,13 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
           
           <div>
             <div className="flex items-center justify-between text-xs mb-2">
-              <span className="text-[#D4AF37] font-bold uppercase tracking-wider">
+              <span className="text-[#8C6914] dark:text-[#D4AF37] font-bold uppercase tracking-wider">
                 {product.category}
               </span>
-              <div className="flex items-center gap-1 text-amber-500 font-bold">
+              <div className="flex items-center gap-1 text-amber-700 dark:text-amber-500 font-bold">
                 <Star className="w-4 h-4 fill-amber-400" />
                 <span>{product.rating}</span>
-                <span className="text-gray-400 text-[11px]">
+                <span className="text-gray-500 dark:text-gray-400 text-[11px]">
                   ({product.reviewsCount} {language === 'en' ? 'customer reviews' : 'تقييم عملاء'})
                 </span>
               </div>
@@ -227,7 +227,7 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
                 {formatPrice(product.price * quantity)}
               </span>
               {product.originalPrice && (
-                <span className="text-base text-gray-400 line-through">
+                <span className="text-base text-gray-500 dark:text-gray-400 line-through">
                   {formatPrice(product.originalPrice * quantity)}
                 </span>
               )}
@@ -428,7 +428,7 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
 
               <button
                 onClick={handleWhatsAppOrder}
-                className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white py-3 rounded-2xl font-extrabold text-sm shadow-md transition-all text-center flex items-center justify-center gap-2"
+                className="w-full bg-[#0B7A3D] hover:bg-[#096830] text-white py-3 rounded-2xl font-extrabold text-sm shadow-md transition-all text-center flex items-center justify-center gap-2"
               >
                 <MessageCircle className="w-4 h-4" />
                 <span>{language === 'en' ? 'Direct WhatsApp Order' : 'طلب مباشر عبر الواتساب'}</span>
@@ -498,7 +498,7 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
                   </div>
                 </div>
                 <p className="text-xs text-gray-600 dark:text-gray-300">{rev.comment}</p>
-                <span className="text-[10px] text-gray-400 block">{rev.date} • {rev.city}</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400 block">{rev.date} • {rev.city}</span>
               </div>
             ))}
           </div>

@@ -117,13 +117,13 @@ export const ProductCardComponent: React.FC<ProductCardProps> = ({
         <div>
           {/* Category Subtext & Rating */}
           <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
-            <span className="text-[#D4AF37] font-semibold text-[11px] uppercase tracking-wider">
+            <span className="text-[#8C6914] dark:text-[#D4AF37] font-semibold text-[11px] uppercase tracking-wider">
               {product.category}
             </span>
-            <div className="flex items-center gap-1 text-amber-500 font-bold">
+            <div className="flex items-center gap-1 text-amber-700 dark:text-amber-500 font-bold">
               <Star className="w-3.5 h-3.5 fill-amber-400" />
               <span>{product.rating}</span>
-              <span className="text-gray-400 text-[10px]">({product.reviewsCount})</span>
+              <span className="text-gray-500 dark:text-gray-400 text-[10px]">({product.reviewsCount})</span>
             </div>
           </div>
 
@@ -146,7 +146,7 @@ export const ProductCardComponent: React.FC<ProductCardProps> = ({
                 {formatPrice(product.price)}
               </span>
               {product.originalPrice && (
-                <span className="text-xs text-gray-400 line-through">
+                <span className="text-xs text-gray-500 dark:text-gray-400 line-through">
                   {formatPrice(product.originalPrice)}
                 </span>
               )}

@@ -132,7 +132,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
               <span className="font-heading font-bold text-lg sm:text-2xl tracking-wide text-[#7D0A0A] dark:text-[#F3F3F3] leading-none whitespace-nowrap">
                 عبق نزوى
               </span>
-              <span className="hidden sm:inline-block text-[10px] tracking-widest text-[#D4AF37] uppercase font-serif-accent mt-0.5">
+              <span className="hidden sm:inline-block text-[10px] tracking-widest text-[#8C6914] dark:text-[#D4AF37] uppercase font-serif-accent mt-0.5">
                 Abaq Nizwa • Oman
               </span>
             </div>

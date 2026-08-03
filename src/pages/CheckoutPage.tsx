@@ -27,19 +27,19 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, on
   const { cart, cartSubtotal, discountAmount, deliveryFee, cartTotal, formatPrice, createOrder, appliedCoupon } = useStore();
   const { t, language } = useLanguage();
 
-  const [customerName, setCustomerName] = useState(language === 'en' ? 'Fatma Al-Zadjali' : 'فاطمة الزدجالية');
-  const [customerPhone, setCustomerPhone] = useState('+968 98765432');
-  const [customerEmail, setCustomerEmail] = useState('fatma.z@gmail.com');
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
 
-  const [city, setCity] = useState(language === 'en' ? 'Muscat' : 'مسقط');
-  const [area, setArea] = useState(language === 'en' ? 'Al-Qurm' : 'القرم');
-  const [street, setStreet] = useState(language === 'en' ? 'Sultan Qaboos Street' : 'شارع السلطان قابوس');
-  const [building, setBuilding] = useState(language === 'en' ? 'Villa 42' : 'فيلا 42');
-  const [notes, setNotes] = useState(language === 'en' ? 'Please call 15 minutes prior to arrival' : 'يرجى الاتصال قبل الوصول بـ 15 دقيقة');
+  const [city, setCity] = useState('');
+  const [area, setArea] = useState('');
+  const [street, setStreet] = useState('');
+  const [building, setBuilding] = useState('');
+  const [notes, setNotes] = useState('');
 
-  const [isForSomeoneElse, setIsForSomeoneElse] = useState(true);
-  const [recipientName, setRecipientName] = useState(language === 'en' ? 'Said Al-Busaidi' : 'سعيد البوسعيدي');
-  const [recipientPhone, setRecipientPhone] = useState('+968 91234567');
+  const [isForSomeoneElse, setIsForSomeoneElse] = useState(false);
+  const [recipientName, setRecipientName] = useState('');
+  const [recipientPhone, setRecipientPhone] = useState('');
 
   const [deliveryDate, setDeliveryDate] = useState(
     new Date(Date.now() + 86400000).toISOString().split('T')[0]
@@ -154,7 +154,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, on
       <div className="border-b border-gray-100 dark:border-gray-800 pb-4 space-y-4">
         {/* Checkout Steps Progress Bar */}
         <div className="flex items-center justify-between max-w-2xl mx-auto bg-gray-50 dark:bg-[#151111] p-3 rounded-2xl border border-gray-100 dark:border-gray-800 text-xs font-bold">
-          <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+          <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400">
             <CheckCircle2 className="w-4 h-4" />
             <span>{language === 'en' ? '1. Gift Basket' : '١. السلة المختارة'}</span>
           </div>
@@ -164,7 +164,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, on
             <span>{language === 'en' ? '2. Address & Recipient' : '٢. العنوان والمستلم'}</span>
           </div>
           <span className="text-gray-300">➔</span>
-          <div className="flex items-center gap-1.5 text-gray-400">
+          <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
             <CreditCard className="w-4 h-4" />
             <span>{language === 'en' ? '3. Royal Payment' : '٣. الدفع الفاخر'}</span>
           </div>
@@ -202,6 +202,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, on
                   required
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
+                  placeholder={language === 'en' ? 'e.g. Ahmed Al-Balushi' : 'مثال: أحمد البلوشي'}
                   className="w-full bg-gray-50 dark:bg-gray-800 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700"
                 />
               </div>
@@ -213,6 +214,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, on
                   required
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
+                  placeholder="+968 9XXX XXXX"
                   className="w-full bg-gray-50 dark:bg-gray-800 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700"
                 />
               </div>
@@ -224,6 +226,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, on
                   required
                   value={customerEmail}
                   onChange={(e) => setCustomerEmail(e.target.value)}
+                  placeholder="name@example.com"
                   className="w-full bg-gray-50 dark:bg-gray-800 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700"
                 />
               </div>
@@ -257,6 +260,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, on
                     required
                     value={recipientName}
                     onChange={(e) => setRecipientName(e.target.value)}
+                    placeholder={language === 'en' ? 'e.g. Maryam Al-Harthy' : 'مثال: مريم الحارثية'}
                     className="w-full bg-white dark:bg-gray-800 p-2 rounded-xl border border-gray-300 dark:border-gray-700"
                   />
                 </div>
@@ -267,6 +271,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, on
                     required
                     value={recipientPhone}
                     onChange={(e) => setRecipientPhone(e.target.value)}
+                    placeholder="+968 9XXX XXXX"
                     className="w-full bg-white dark:bg-gray-800 p-2 rounded-xl border border-gray-300 dark:border-gray-700"
                   />
                 </div>
@@ -306,10 +311,12 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, on
               <div>
                 <label className="font-semibold block mb-1">{t('city_oman')}</label>
                 <select
+                  required
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   className="w-full bg-gray-50 dark:bg-gray-800 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 font-bold"
                 >
+                  <option value="" disabled>{language === 'en' ? 'Select city' : 'اختر المدينة'}</option>
                   {omanCities.map((c) => (
                     <option key={c} value={c}>{c}</option>
                   ))}
@@ -323,6 +330,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, on
                   required
                   value={area}
                   onChange={(e) => setArea(e.target.value)}
+                  placeholder={language === 'en' ? 'e.g. Qurum' : 'مثال: القرم'}
                   className="w-full bg-gray-50 dark:bg-gray-800 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700"
                 />
               </div>
@@ -334,6 +342,29 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, on
                   required
                   value={street}
                   onChange={(e) => setStreet(e.target.value)}
+                  placeholder={language === 'en' ? 'e.g. Sultan Qaboos Street' : 'مثال: شارع السلطان قابوس'}
+                  className="w-full bg-gray-50 dark:bg-gray-800 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700"
+                />
+              </div>
+
+              <div>
+                <label className="font-semibold block mb-1">{language === 'en' ? 'Building / Villa No. (Optional):' : 'رقم المبنى / الفيلا (اختياري):'}</label>
+                <input
+                  type="text"
+                  value={building}
+                  onChange={(e) => setBuilding(e.target.value)}
+                  placeholder={language === 'en' ? 'e.g. Villa 12' : 'مثال: فيلا 12'}
+                  className="w-full bg-gray-50 dark:bg-gray-800 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700"
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="font-semibold block mb-1">{language === 'en' ? 'Delivery Notes (Optional):' : 'ملاحظات التوصيل (اختياري):'}</label>
+                <input
+                  type="text"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder={language === 'en' ? 'e.g. Please call before arrival' : 'مثال: يرجى الاتصال قبل الوصول'}
                   className="w-full bg-gray-50 dark:bg-gray-800 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700"
                 />
               </div>
@@ -422,7 +453,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, on
                 <span className="font-bold text-gray-900 dark:text-gray-100">{formatPrice(cartSubtotal)}</span>
               </div>
               {discountAmount > 0 && (
-                <div className="flex justify-between text-emerald-600 font-bold">
+                <div className="flex justify-between text-emerald-700 dark:text-emerald-400 font-bold">
                   <span>{t('discount')}</span>
                   <span>-{formatPrice(discountAmount)}</span>
                 </div>
@@ -468,7 +499,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, on
                   );
                   window.open(`https://wa.me/96891234567?text=${msg}`, '_blank');
                 }}
-                className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white py-3 rounded-2xl font-bold text-xs shadow-md flex items-center justify-center gap-2"
+                className="w-full bg-[#0B7A3D] hover:bg-[#096830] text-white py-3 rounded-2xl font-bold text-xs shadow-md flex items-center justify-center gap-2"
               >
                 <MessageCircle className="w-4 h-4" />
                 <span>{language === 'en' ? 'Quick Confirm via WhatsApp' : 'تأكيد سريع عبر الواتساب 💬'}</span>

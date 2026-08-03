@@ -135,7 +135,7 @@ export const AdminDashboard: React.FC = () => {
               <div className="text-3xl font-extrabold text-[#7D0A0A] dark:text-[#D4AF37] font-heading">
                 {formatPrice(totalSalesOMR)}
               </div>
-              <span className="text-[11px] text-emerald-600 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full font-bold inline-block">
+              <span className="text-[11px] text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full font-bold inline-block">
                 {language === 'en' ? '+18.5% vs Last Month' : '+18.5% مقارنة بالشهر الماضي'}
               </span>
             </div>
@@ -145,7 +145,7 @@ export const AdminDashboard: React.FC = () => {
               <div className="text-3xl font-extrabold text-gray-900 dark:text-gray-100 font-heading">
                 {totalOrders} {language === 'en' ? 'Orders' : 'طلبات'}
               </div>
-              <span className="text-[11px] text-gray-400 block">{language === 'en' ? 'Across all Omani Governorates' : 'من كافة محافظات سلطنة عمان'}</span>
+              <span className="text-[11px] text-gray-500 dark:text-gray-400 block">{language === 'en' ? 'Across all Omani Governorates' : 'من كافة محافظات سلطنة عمان'}</span>
             </div>
 
             <div className="bg-white dark:bg-[#151111] p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm space-y-2">
@@ -153,7 +153,7 @@ export const AdminDashboard: React.FC = () => {
               <div className="text-3xl font-extrabold text-gray-900 dark:text-gray-100 font-heading">
                 {totalProducts} {language === 'en' ? 'Items' : 'منتجاً'}
               </div>
-              <span className="text-[11px] text-gray-400 block">{language === 'en' ? 'Ready for express dispatch' : 'جاهزة للتوصيل الفوري'}</span>
+              <span className="text-[11px] text-gray-500 dark:text-gray-400 block">{language === 'en' ? 'Ready for express dispatch' : 'جاهزة للتوصيل الفوري'}</span>
             </div>
 
             <div className="bg-white dark:bg-[#151111] p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm space-y-2">
@@ -161,7 +161,7 @@ export const AdminDashboard: React.FC = () => {
               <div className="text-3xl font-extrabold text-gray-900 dark:text-gray-100 font-heading">
                 {formatPrice(totalSalesOMR / (totalOrders || 1))}
               </div>
-              <span className="text-[11px] text-emerald-600 font-bold block">{language === 'en' ? 'High-Ticket Luxury Basket' : 'معدل شراء فاخر high-ticket'}</span>
+              <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-bold block">{language === 'en' ? 'High-Ticket Luxury Basket' : 'معدل شراء فاخر high-ticket'}</span>
             </div>
           </div>
         </div>
@@ -195,7 +195,7 @@ export const AdminDashboard: React.FC = () => {
                     </td>
                     <td className="py-3.5 px-2 font-bold text-gray-900 dark:text-gray-100">
                       <div>{ord.customerName}</div>
-                      <div className="text-[10px] text-gray-400">To: {ord.recipientName} ({ord.shippingAddress.city})</div>
+                      <div className="text-[10px] text-gray-500 dark:text-gray-400">To: {ord.recipientName} ({ord.shippingAddress.city})</div>
                     </td>
                     <td className="py-3.5 px-2 text-gray-500">
                       {ord.date} <br /> {ord.deliveryTime}
@@ -306,10 +306,10 @@ export const AdminDashboard: React.FC = () => {
               <div key={r.id} className="p-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/40 text-xs space-y-1">
                 <div className="flex justify-between items-center font-bold">
                   <span>{r.userName} ({r.city})</span>
-                  <span className="text-amber-500">★ {r.rating}</span>
+                  <span className="text-amber-700 dark:text-amber-500">★ {r.rating}</span>
                 </div>
                 <p className="text-gray-600 dark:text-gray-300">"{r.comment}"</p>
-                <span className="text-[10px] text-gray-400 block">{r.date}</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400 block">{r.date}</span>
               </div>
             ))}
           </div>

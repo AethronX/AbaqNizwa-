@@ -445,9 +445,9 @@ export const HomePage: React.FC<HomePageProps> = ({ setActiveTab, onSelectProduc
                 <div className="pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs">
                   <div>
                     <p className="font-bold text-gray-900 dark:text-gray-100">{rev.userName}</p>
-                    <span className="text-[10px] text-gray-400">{rev.city}</span>
+                    <span className="text-[10px] text-gray-500 dark:text-gray-400">{rev.city}</span>
                   </div>
-                  <span className="text-[10px] text-emerald-600 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full font-semibold">
+                  <span className="text-[10px] text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full font-semibold">
                     {language === 'en' ? 'Verified Buyer ✓' : 'مشتري مؤكد ✓'}
                   </span>
                 </div>

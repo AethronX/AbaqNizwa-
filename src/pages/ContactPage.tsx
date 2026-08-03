@@ -125,7 +125,7 @@ export const ContactPage: React.FC = () => {
                 href="https://wa.me/96891234567"
                 target="_blank"
                 rel="noreferrer"
-                className="w-full bg-[#25D366] text-white py-3 rounded-2xl font-bold text-xs shadow-lg flex items-center justify-center gap-2"
+                className="w-full bg-[#0B7A3D] hover:bg-[#096830] text-white py-3 rounded-2xl font-bold text-xs shadow-lg flex items-center justify-center gap-2 transition-colors"
               >
                 <MessageCircle className="w-4 h-4" />
                 <span>{language === 'en' ? 'WhatsApp (+96891234567)' : 'الواتساب (+96891234567)'}</span>

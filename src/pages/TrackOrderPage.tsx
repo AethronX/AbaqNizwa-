@@ -84,7 +84,7 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ initialOrderNumb
               <h2 className="text-2xl font-extrabold font-heading text-[#7D0A0A] dark:text-[#D4AF37]">
                 {searchedOrder.orderNumber}
               </h2>
-              <span className="text-[11px] text-gray-400 block mt-0.5">{language === 'en' ? 'Order Date:' : 'تاريخ الطلب:'} {searchedOrder.date}</span>
+              <span className="text-[11px] text-gray-500 dark:text-gray-400 block mt-0.5">{language === 'en' ? 'Order Date:' : 'تاريخ الطلب:'} {searchedOrder.date}</span>
             </div>
 
             <div className="flex flex-col sm:items-end gap-1">
@@ -112,7 +112,7 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ initialOrderNumb
                     className={`absolute right-0 top-1 w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs shadow-md z-10 ${
                       step.completed
                         ? 'bg-[#7D0A0A] text-[#D4AF37] border-2 border-[#D4AF37]'
-                        : 'bg-gray-200 dark:bg-gray-800 text-gray-400'
+                        : 'bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
                     }`}
                   >
                     {step.completed ? '✓' : idx + 1}
@@ -127,7 +127,7 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ initialOrderNumb
                       <h4 className={`font-bold text-sm ${step.completed ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500'}`}>
                         {language === 'en' ? step.titleEn : step.titleAr}
                       </h4>
-                      <span className="text-[11px] text-gray-400">{step.time}</span>
+                      <span className="text-[11px] text-gray-500 dark:text-gray-400">{step.time}</span>
                     </div>
                   </div>
                 </div>
