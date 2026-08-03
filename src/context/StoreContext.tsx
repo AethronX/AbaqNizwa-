@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Product, CartItem, WishlistItem, Order, Coupon, Review, Customer, OrderStatus } from '../types';
+import { Product, CartItem, Order, Coupon, Review, Customer, OrderStatus } from '../types';
 import { PRODUCTS as initialProducts, REVIEWS as initialReviews, COUPONS as initialCoupons, INITIAL_ORDERS, MOCK_CUSTOMERS } from '../data/mockData';
 
 export type Currency = 'OMR' | 'SAR' | 'USD';
@@ -27,12 +27,8 @@ interface StoreContextType {
   discountAmount: number;
   deliveryFee: number;
   cartTotal: number;
-  wishlist: WishlistItem[];
-  toggleWishlist: (product: Product) => void;
-  isInWishlist: (productId: string) => boolean;
   orders: Order[];
   createOrder: (orderData: Omit<Order, 'id' | 'orderNumber' | 'date' | 'status' | 'trackingTimeline'>) => Order;
-  getOrderByIdOrNumber: (idOrNum: string) => Order | undefined;
   updateOrderStatus: (orderId: string, status: OrderStatus) => void;
   reviews: Review[];
   addReview: (review: Omit<Review, 'id' | 'date' | 'verified'>) => void;
@@ -69,11 +65,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return saved ? JSON.parse(saved) : [];
   });
 
-  const [wishlist, setWishlist] = useState<WishlistItem[]>(() => {
-    const saved = localStorage.getItem('abaq_wishlist');
-    return saved ? JSON.parse(saved) : [];
-  });
-
   const [orders, setOrders] = useState<Order[]>(() => {
     const saved = localStorage.getItem('abaq_orders');
     return saved ? JSON.parse(saved) : INITIAL_ORDERS;
@@ -106,10 +97,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     localStorage.setItem('abaq_cart', JSON.stringify(cart));
   }, [cart]);
-
-  useEffect(() => {
-    localStorage.setItem('abaq_wishlist', JSON.stringify(wishlist));
-  }, [wishlist]);
 
   useEffect(() => {
     localStorage.setItem('abaq_orders', JSON.stringify(orders));
@@ -212,21 +199,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const deliveryFee = cart.length > 0 ? 3.00 : 0; // Standard fast delivery in Oman
   const cartTotal = Math.max(0, cartSubtotal - discountAmount + deliveryFee);
 
-  const toggleWishlist = (product: Product) => {
-    const exists = wishlist.some((w) => w.product.id === product.id);
-    if (exists) {
-      setWishlist((prev) => prev.filter((w) => w.product.id !== product.id));
-      showToast(`تمت إزالة "${product.nameAr}" من المفضلة`, 'info');
-    } else {
-      setWishlist((prev) => [{ product, addedAt: new Date().toISOString() }, ...prev]);
-      showToast(`تمت إضافة "${product.nameAr}" للمفضلة ❤️`);
-    }
-  };
-
-  const isInWishlist = (productId: string) => {
-    return wishlist.some((w) => w.product.id === productId);
-  };
-
   const addRecentlyViewed = (product: Product) => {
     setRecentlyViewed((prev) => {
       const filtered = prev.filter((p) => p.id !== product.id);
@@ -254,11 +226,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     clearCart();
     showToast(`تمت عملية الشراء بنجاح! رقم الطلب ${orderNum} 🌸`);
     return newOrder;
-  };
-
-  const getOrderByIdOrNumber = (idOrNum: string) => {
-    const term = idOrNum.trim().toLowerCase();
-    return orders.find((o) => o.id.toLowerCase() === term || o.orderNumber.toLowerCase() === term);
   };
 
   const updateOrderStatus = (orderId: string, status: OrderStatus) => {
@@ -344,12 +311,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         discountAmount,
         deliveryFee,
         cartTotal,
-        wishlist,
-        toggleWishlist,
-        isInWishlist,
         orders,
         createOrder,
-        getOrderByIdOrNumber,
         updateOrderStatus,
         reviews,
         addReview,

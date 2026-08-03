@@ -23,13 +23,10 @@ const translations: Record<string, { ar: string; en: string }> = {
   nav_categories: { ar: 'التصنيفات', en: 'Categories' },
   nav_custom_gift: { ar: 'تصميم حسب الطلب', en: 'Custom Gift' },
   nav_occasions: { ar: 'المناسبات', en: 'Occasions' },
-  nav_track_order: { ar: 'تتبع الطلب', en: 'Track Order' },
   nav_about: { ar: 'عن عبق نزوى', en: 'About Us' },
   nav_contact: { ar: 'تواصل معنا', en: 'Contact Us' },
   nav_admin: { ar: 'لوحة التحكم', en: 'Admin Portal' },
-  nav_wishlist: { ar: 'المفضلة', en: 'Wishlist' },
   nav_cart: { ar: 'سلة الهدايا', en: 'Gift Basket' },
-  nav_account: { ar: 'حسابي', en: 'My Account' },
 
   // Categories
   cat_title: { ar: 'تصنيفاتنا الفاخرة', en: 'Our Luxury Categories' },

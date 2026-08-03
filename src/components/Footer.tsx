@@ -7,7 +7,8 @@ import {
   Phone,
   Mail,
   MapPin,
-  Heart
+  Heart,
+  MessageCircle
 } from 'lucide-react';
 
 interface FooterProps {
@@ -109,14 +110,6 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab }) => {
                   {language === 'en' ? 'Wedding & Graduation Gifts' : 'هدايا الزواج والتخرج'}
                 </button>
               </li>
-              <li>
-                <button
-                  onClick={() => handleNavClick('track-order')}
-                  className="hover:text-[#D4AF37] transition-colors"
-                >
-                  {language === 'en' ? 'Track Your Gift Order' : 'تتبع حالة طلبك'}
-                </button>
-              </li>
             </ul>
           </div>
 
@@ -199,14 +192,11 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab }) => {
             </span>
           </div>
 
-          {/* Accepted payment logos simulation */}
-          <div className="flex flex-wrap items-center justify-center gap-2 max-w-sm md:max-w-none">
-            <span className="text-gray-400 text-[11px] w-full sm:w-auto text-center">وسائل الدفع المقبولة:</span>
-            <span className="px-2 py-1 bg-white/10 rounded text-[10px] font-bold text-white">Apple Pay</span>
-            <span className="px-2 py-1 bg-white/10 rounded text-[10px] font-bold text-white">Google Pay</span>
-            <span className="px-2 py-1 bg-[#7D0A0A] rounded text-[10px] font-bold text-[#D4AF37]">Thawani ثواني</span>
-            <span className="px-2 py-1 bg-white/10 rounded text-[10px] font-bold text-white">Visa</span>
-            <span className="px-2 py-1 bg-white/10 rounded text-[10px] font-bold text-white">Mastercard</span>
+          <div className="flex items-center justify-center gap-2">
+            <span className="px-3 py-1.5 bg-[#0B7A3D]/20 border border-[#0B7A3D]/40 rounded-full text-[11px] font-bold text-emerald-300 flex items-center gap-1.5">
+              <MessageCircle className="w-3.5 h-3.5" />
+              {language === 'en' ? 'Orders confirmed via WhatsApp' : 'تأكيد الطلبات عبر واتساب'}
+            </span>
           </div>
         </div>
 

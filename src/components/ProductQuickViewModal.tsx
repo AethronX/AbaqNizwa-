@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Product } from '../types';
 import { useStore } from '../context/StoreContext';
 import { useLanguage } from '../context/LanguageContext';
-import { X, Star, Heart, ShoppingBag, Truck, Calendar, Sparkles } from 'lucide-react';
+import { X, Star, ShoppingBag, Truck, Calendar, Sparkles } from 'lucide-react';
 import fallbackImg from '../assets/images/royal_flower_bouquet_1785404632631.jpg';
 
 interface ProductQuickViewModalProps {
@@ -17,7 +17,7 @@ export const ProductQuickViewModal: React.FC<ProductQuickViewModalProps> = ({
   onGoToDetails,
 }) => {
   const { language } = useLanguage();
-  const { formatPrice, addToCart, toggleWishlist, isInWishlist } = useStore();
+  const { formatPrice, addToCart } = useStore();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState(
@@ -26,8 +26,6 @@ export const ProductQuickViewModal: React.FC<ProductQuickViewModalProps> = ({
   const [selectedWrapping, setSelectedWrapping] = useState(
     product.wrappingColors ? product.wrappingColors[0].nameAr : ''
   );
-
-  const isLiked = isInWishlist(product.id);
 
   const title = language === 'ar' ? product.nameAr : product.nameEn;
   const description = language === 'ar' ? product.descriptionAr : product.descriptionEn;
@@ -69,14 +67,6 @@ export const ProductQuickViewModal: React.FC<ProductQuickViewModalProps> = ({
                 }}
                 className="w-full h-full object-cover"
               />
-              <button
-                onClick={() => toggleWishlist(product)}
-                className={`absolute top-3 right-3 p-2 rounded-full ${
-                  isLiked ? 'bg-[#7D0A0A] text-white' : 'bg-white/80 text-gray-700'
-                }`}
-              >
-                <Heart className={`w-4 h-4 ${isLiked ? 'fill-white' : ''}`} />
-              </button>
             </div>
             {product.images.length > 1 && (
               <div className="flex gap-2">

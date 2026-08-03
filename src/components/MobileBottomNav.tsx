@@ -1,7 +1,7 @@
 import React from 'react';
 import { useStore } from '../context/StoreContext';
 import { useLanguage } from '../context/LanguageContext';
-import { Home, Store, Sparkles, Heart, ShoppingBag, User } from 'lucide-react';
+import { Home, Store, Sparkles, ShoppingBag } from 'lucide-react';
 
 interface MobileBottomNavProps {
   activeTab: string;
@@ -9,17 +9,15 @@ interface MobileBottomNavProps {
 }
 
 export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ activeTab, setActiveTab }) => {
-  const { cart, wishlist } = useStore();
+  const { cart } = useStore();
   const { t, language } = useLanguage();
 
   const totalCartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
-  const totalWishlistCount = wishlist.length;
 
   const navItems = [
     { id: 'home', label: t('nav_home'), icon: Home },
     { id: 'shop', label: t('nav_shop'), icon: Store },
     { id: 'custom-gift', label: language === 'en' ? 'Custom Gift' : 'صمّم هديتك', icon: Sparkles, highlight: true },
-    { id: 'wishlist', label: language === 'en' ? 'Wishlist' : 'المفضلة', icon: Heart, badge: totalWishlistCount },
     { id: 'cart', label: language === 'en' ? 'Basket' : 'السلة', icon: ShoppingBag, badge: totalCartCount },
   ];
 
@@ -30,7 +28,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ activeTab, set
 
   return (
     <div className="lg:hidden fixed bottom-0 inset-x-0 w-full z-40 bg-white/95 dark:bg-[#0D0A0A]/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-800 px-1 py-1.5 shadow-2xl">
-      <div className="grid grid-cols-5 items-center w-full max-w-lg mx-auto">
+      <div className="grid grid-cols-4 items-center w-full max-w-lg mx-auto">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;

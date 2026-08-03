@@ -63,11 +63,6 @@ export interface CartItem {
   customAddonPrice?: number;
 }
 
-export interface WishlistItem {
-  product: Product;
-  addedAt: string;
-}
-
 export type OrderStatus = 'pending' | 'preparing' | 'arranging' | 'shipped' | 'delivered' | 'cancelled';
 
 export interface TimelineStep {
@@ -102,7 +97,7 @@ export interface Order {
   };
   deliveryDate: string;
   deliveryTime: string;
-  paymentMethod: 'apple_pay' | 'google_pay' | 'visa' | 'thawani' | 'cod';
+  paymentMethod: 'apple_pay' | 'google_pay' | 'visa' | 'thawani' | 'cod' | 'whatsapp';
   paymentStatus: 'paid' | 'pending' | 'failed';
   trackingTimeline: TimelineStep[];
   couponCode?: string;

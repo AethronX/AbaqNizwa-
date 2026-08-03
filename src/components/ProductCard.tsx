@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Product } from '../types';
 import { useStore } from '../context/StoreContext';
 import { useLanguage } from '../context/LanguageContext';
-import { Heart, ShoppingBag, Eye, Star, Sparkles } from 'lucide-react';
+import { ShoppingBag, Eye, Star, Sparkles } from 'lucide-react';
 import fallbackImg from '../assets/images/royal_flower_bouquet_1785404632631.jpg';
 
 interface ProductCardProps {
@@ -17,10 +17,8 @@ export const ProductCardComponent: React.FC<ProductCardProps> = ({
   onQuickView,
 }) => {
   const { language } = useLanguage();
-  const { formatPrice, addToCart, toggleWishlist, isInWishlist } = useStore();
+  const { formatPrice, addToCart } = useStore();
   const [isHovered, setIsHovered] = useState(false);
-
-  const isLiked = isInWishlist(product.id);
 
   const [imgSrc, setImgSrc] = useState(product.images[0]);
 
@@ -35,11 +33,6 @@ export const ProductCardComponent: React.FC<ProductCardProps> = ({
       selectedSize: product.sizes ? product.sizes[0].nameAr : undefined,
       selectedWrappingColor: product.wrappingColors ? product.wrappingColors[0].nameAr : undefined,
     });
-  };
-
-  const handleWishlist = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    toggleWishlist(product);
   };
 
   return (
@@ -83,19 +76,6 @@ export const ProductCardComponent: React.FC<ProductCardProps> = ({
             </span>
           )}
         </div>
-
-        {/* Wishlist Button */}
-        <button
-          onClick={handleWishlist}
-          className={`absolute top-3 left-3 w-8 h-8 rounded-full flex items-center justify-center transition-all z-10 ${
-            isLiked
-              ? 'bg-[#7D0A0A] text-white shadow-md'
-              : 'bg-white/80 dark:bg-black/60 text-gray-700 dark:text-gray-200 hover:bg-white dark:hover:bg-black'
-          }`}
-          title={language === 'en' ? 'Wishlist' : 'المفضلة'}
-        >
-          <Heart className={`w-4 h-4 ${isLiked ? 'fill-white' : ''}`} />
-        </button>
 
         {/* Quick View Button on Hover */}
         {onQuickView && (

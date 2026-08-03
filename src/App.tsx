@@ -20,9 +20,6 @@ const CustomGiftStudio = lazy(() => import('./components/CustomGiftStudio').then
 const ProductDetailsPage = lazy(() => import('./pages/ProductDetailsPage').then(m => ({ default: m.ProductDetailsPage })));
 const CartPage = lazy(() => import('./pages/CartPage').then(m => ({ default: m.CartPage })));
 const CheckoutPage = lazy(() => import('./pages/CheckoutPage').then(m => ({ default: m.CheckoutPage })));
-const WishlistPage = lazy(() => import('./pages/WishlistPage').then(m => ({ default: m.WishlistPage })));
-const TrackOrderPage = lazy(() => import('./pages/TrackOrderPage').then(m => ({ default: m.TrackOrderPage })));
-const AccountPage = lazy(() => import('./pages/AccountPage').then(m => ({ default: m.AccountPage })));
 const AboutPage = lazy(() => import('./pages/AboutPage').then(m => ({ default: m.AboutPage })));
 const ContactPage = lazy(() => import('./pages/ContactPage').then(m => ({ default: m.ContactPage })));
 const FAQPage = lazy(() => import('./pages/FAQPage').then(m => ({ default: m.FAQPage })));
@@ -39,17 +36,10 @@ const PageLoadingFallback = () => (
 function MainApp() {
   const [activeTab, setActiveTab] = useState<string>('home');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [trackOrderNumber, setTrackOrderNumber] = useState<string | undefined>(undefined);
 
   const handleSelectProduct = (product: Product) => {
     setSelectedProduct(product);
     setActiveTab('product-details');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleTrackOrderFromPage = (orderNum: string) => {
-    setTrackOrderNumber(orderNum);
-    setActiveTab('track-order');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -103,29 +93,8 @@ function MainApp() {
 
         {activeTab === 'checkout' && (
           <CheckoutPage
-            onOrderCompleted={(order) => {
-              setTrackOrderNumber(order.orderNumber);
-              setActiveTab('track-order');
-            }}
+            onOrderCompleted={() => setActiveTab('home')}
             onBackToCart={() => setActiveTab('cart')}
-          />
-        )}
-
-        {activeTab === 'wishlist' && (
-          <WishlistPage
-            onSelectProduct={handleSelectProduct}
-            setActiveTab={setActiveTab}
-          />
-        )}
-
-        {activeTab === 'track-order' && (
-          <TrackOrderPage initialOrderNumber={trackOrderNumber} />
-        )}
-
-        {activeTab === 'account' && (
-          <AccountPage
-            setActiveTab={setActiveTab}
-            onTrackOrder={handleTrackOrderFromPage}
           />
         )}
 
