@@ -327,7 +327,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setActiveTab, onSelectProduc
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           {displayedBestSellers.slice(0, 8).map((product) => (
             <ProductCard
               key={product.id}
