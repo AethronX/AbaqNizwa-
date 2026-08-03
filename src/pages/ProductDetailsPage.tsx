@@ -5,7 +5,6 @@ import { useLanguage } from '../context/LanguageContext';
 import { ProductCard } from '../components/ProductCard';
 import {
   Star,
-  Heart,
   ShoppingBag,
   Truck,
   ShieldCheck,
@@ -38,8 +37,6 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
   const {
     formatPrice,
     addToCart,
-    toggleWishlist,
-    isInWishlist,
     products,
     reviews,
     addReview,
@@ -72,7 +69,6 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
   const [newComment, setNewComment] = useState('');
   const [reviewerName, setReviewerName] = useState('');
 
-  const isLiked = isInWishlist(product.id);
   const title = language === 'ar' ? product.nameAr : product.nameEn;
   const description = language === 'ar' ? product.descriptionAr : product.descriptionEn;
 
@@ -159,16 +155,6 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
               }}
               className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
-
-            <button
-              onClick={() => toggleWishlist(product)}
-              aria-label={language === 'en' ? 'Toggle wishlist' : 'إضافة إلى المفضلة'}
-              className={`absolute top-4 right-4 p-3 rounded-full shadow-md transition-all ${
-                isLiked ? 'bg-[#7D0A0A] text-white' : 'bg-white/80 dark:bg-black/60 text-gray-700'
-              }`}
-            >
-              <Heart className={`w-5 h-5 ${isLiked ? 'fill-white' : ''}`} />
-            </button>
           </div>
 
           {/* Thumbnails */}

@@ -4,14 +4,12 @@ import { useTheme } from '../context/ThemeContext';
 import { useStore } from '../context/StoreContext';
 import {
   ShoppingBag,
-  Heart,
   Search,
   Menu,
   X,
   Sun,
   Moon,
   Globe,
-  User,
   Sparkles,
   Flower2,
 } from 'lucide-react';
@@ -27,7 +25,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
   const { theme, toggleTheme } = useTheme();
   const {
     cart,
-    wishlist,
     currency,
     setCurrency,
     searchQuery,
@@ -40,7 +37,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
   const [searchOpen, setSearchOpen] = useState(false);
 
   const totalCartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
-  const totalWishlistCount = wishlist.length;
 
   const handleNavClick = (tab: string) => {
     setActiveTab(tab);
@@ -58,7 +54,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
     { id: 'occasions', label: t('nav_occasions') },
   ];
   const utilityLinks = [
-    { id: 'track-order', label: t('nav_track_order') },
     { id: 'about', label: t('nav_about') },
     { id: 'contact', label: t('nav_contact') },
   ];
@@ -186,27 +181,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
               title="بحث في المتجر"
             >
               <Search className="w-4 h-4 sm:w-5 sm:h-5 hover:text-[#7D0A0A]" />
-            </button>
-
-            <button
-              onClick={() => handleNavClick('wishlist')}
-              className="hidden sm:flex p-2 rounded-full hover:bg-gray-100 dark:hover:bg-[#1A1515] text-gray-700 dark:text-gray-300 transition-colors relative"
-              title="المفضلة"
-            >
-              <Heart className={`w-5 h-5 ${totalWishlistCount > 0 ? 'text-[#7D0A0A] fill-[#7D0A0A]' : ''}`} />
-              {totalWishlistCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#7D0A0A] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                  {totalWishlistCount}
-                </span>
-              )}
-            </button>
-
-            <button
-              onClick={() => handleNavClick('account')}
-              className="hidden sm:flex p-2 rounded-full hover:bg-gray-100 dark:hover:bg-[#1A1515] text-gray-700 dark:text-gray-300 transition-colors"
-              title="حسابي"
-            >
-              <User className="w-5 h-5" />
             </button>
           </div>
 

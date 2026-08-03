@@ -1,25 +1,19 @@
 import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { useLanguage } from '../context/LanguageContext';
-import { Order } from '../types';
 import {
-  CreditCard,
   CheckCircle2,
-  Truck,
   Calendar,
   Clock,
-  ShieldCheck,
   User,
   MapPin,
-  Sparkles,
   ArrowRight,
   ArrowLeft,
-  PackageCheck,
   MessageCircle
 } from 'lucide-react';
 
 interface CheckoutPageProps {
-  onOrderCompleted: (order: Order) => void;
+  onOrderCompleted: () => void;
   onBackToCart: () => void;
 }
 
@@ -45,96 +39,91 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, on
     new Date(Date.now() + 86400000).toISOString().split('T')[0]
   );
   const [deliveryTime, setDeliveryTime] = useState(language === 'en' ? '5:00 PM - 8:00 PM (Evening)' : '17:00 - 20:00 (مساءً)');
-  const [paymentMethod, setPaymentMethod] = useState<'apple_pay' | 'thawani' | 'visa' | 'cod'>('apple_pay');
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [placedOrder, setPlacedOrder] = useState<Order | null>(null);
-
-  const handleSubmitOrder = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    setTimeout(() => {
-      const newOrder = createOrder({
-        customerName,
-        customerPhone,
-        customerEmail,
-        recipientName: isForSomeoneElse ? recipientName : customerName,
-        recipientPhone: isForSomeoneElse ? recipientPhone : customerPhone,
-        shippingAddress: {
-          city,
-          area,
-          street,
-          building,
-          notes,
-        },
-        deliveryDate,
-        deliveryTime,
-        paymentMethod,
-        paymentStatus: paymentMethod === 'cod' ? 'pending' : 'paid',
-        items: cart,
-        subtotal: cartSubtotal,
-        discount: discountAmount,
-        deliveryFee,
-        total: cartTotal,
-        couponCode: appliedCoupon?.code,
-      });
-
-      setIsSubmitting(false);
-      setPlacedOrder(newOrder);
-    }, 1200);
-  };
+  const [orderSent, setOrderSent] = useState(false);
 
   // Oman Cities
   const omanCities = language === 'en'
     ? ['Muscat', 'Nizwa', 'Salalah', 'Sohar', 'Sur', 'Ibri', 'Rustaq', 'Barka', 'Ibra']
     : ['مسقط', 'نزوى', 'صلالة', 'صحار', 'صور', 'عبري', 'الرستاق', 'بركاء', 'إبرا'];
 
-  if (placedOrder) {
+  const buildWhatsAppUrl = () => {
+    const itemsList = cart.map(i => `- ${language === 'en' ? i.product.nameEn : i.product.nameAr} (x${i.quantity})`).join('\n');
+    const finalRecipientName = isForSomeoneElse ? recipientName : customerName;
+    const finalRecipientPhone = isForSomeoneElse ? recipientPhone : customerPhone;
+    const msg = encodeURIComponent(
+      `مرحباً عبق نزوى ✨ أود تأكيد طلبي:\n\n` +
+      `*المنتجات:*\n${itemsList}\n\n` +
+      `*المبلغ الإجمالي:* ${formatPrice(cartTotal)}\n` +
+      `*اسم العميل:* ${customerName} (${customerPhone})\n` +
+      `*البريد الإلكتروني:* ${customerEmail}\n` +
+      `*المستلم:* ${finalRecipientName} (${finalRecipientPhone})\n` +
+      `*العنوان:* ${city} - ${area} - ${street}${building ? ` - ${building}` : ''}\n` +
+      (notes ? `*ملاحظات التوصيل:* ${notes}\n` : '') +
+      `*تاريخ ووقت التوصيل المفضل:* ${deliveryDate} (${deliveryTime})`
+    );
+    return `https://wa.me/96891234567?text=${msg}`;
+  };
+
+  const handleSubmitOrder = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    createOrder({
+      customerName,
+      customerPhone,
+      customerEmail,
+      recipientName: isForSomeoneElse ? recipientName : customerName,
+      recipientPhone: isForSomeoneElse ? recipientPhone : customerPhone,
+      shippingAddress: { city, area, street, building, notes },
+      deliveryDate,
+      deliveryTime,
+      paymentMethod: 'whatsapp',
+      paymentStatus: 'pending',
+      items: cart,
+      subtotal: cartSubtotal,
+      discount: discountAmount,
+      deliveryFee,
+      total: cartTotal,
+      couponCode: appliedCoupon?.code,
+    });
+
+    window.open(buildWhatsAppUrl(), '_blank');
+    setOrderSent(true);
+  };
+
+  if (orderSent) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-16 text-center space-y-6 animate-fadeIn">
+      <div className="max-w-2xl mx-auto px-4 py-16 text-center space-y-6 animate-fadeIn">
         <div className="w-20 h-20 bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 rounded-full flex items-center justify-center mx-auto shadow-inner">
           <CheckCircle2 className="w-10 h-10" />
         </div>
 
         <div className="space-y-2">
-          <span className="text-xs bg-[#D4AF37] text-[#7D0A0A] font-extrabold px-3 py-1 rounded-full inline-block">
-            {language === 'en' ? 'Completed Successfully ✨' : 'تمت العملية بنجاح ✨'}
-          </span>
-          <h1 className="text-3xl font-extrabold font-heading text-gray-900 dark:text-gray-100">
-            {t('order_placed_success')}
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-gray-900 dark:text-gray-100">
+            {language === 'en' ? 'Almost done!' : 'خطوة أخيرة!'}
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            {t('order_number_is')} <strong className="text-[#7D0A0A] dark:text-[#D4AF37] text-lg">{placedOrder.orderNumber}</strong>
+          <p className="text-sm text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+            {language === 'en'
+              ? 'We opened WhatsApp with your order details ready. Please press send there to confirm your order with our team.'
+              : 'فتحنا لك واتساب برسالة الطلب جاهزة. الرجاء الضغط على إرسال هناك لتأكيد طلبك مع فريقنا.'}
           </p>
         </div>
 
-        <div className="bg-white dark:bg-[#151111] p-6 rounded-3xl border border-gray-100 dark:border-gray-800 text-start text-xs space-y-3 max-w-lg mx-auto shadow-md">
-          <div className="flex justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
-            <span className="text-gray-500">{language === 'en' ? 'Recipient:' : 'المستلم:'}</span>
-            <span className="font-bold text-gray-900 dark:text-gray-100">{placedOrder.recipientName} ({placedOrder.recipientPhone})</span>
-          </div>
-          <div className="flex justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
-            <span className="text-gray-500">{language === 'en' ? 'Delivery Date & Slot:' : 'تاريخ وتوقيت التسليم:'}</span>
-            <span className="font-bold text-gray-900 dark:text-gray-100">{placedOrder.deliveryDate} ({placedOrder.deliveryTime})</span>
-          </div>
-          <div className="flex justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
-            <span className="text-gray-500">{language === 'en' ? 'Payment Method:' : 'طريقة الدفع:'}</span>
-            <span className="font-bold text-[#7D0A0A] dark:text-[#D4AF37] uppercase">{placedOrder.paymentMethod}</span>
-          </div>
-          <div className="flex justify-between pt-1 text-sm font-extrabold">
-            <span>{language === 'en' ? 'Total Amount Paid:' : 'إجمالي المبلغ المدفوع:'}</span>
-            <span className="text-[#7D0A0A] dark:text-[#D4AF37]">{formatPrice(placedOrder.total)}</span>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
-          <button
-            onClick={() => onOrderCompleted(placedOrder)}
-            className="bg-[#7D0A0A] hover:bg-[#5A0707] text-white px-8 py-3.5 rounded-full font-bold text-sm shadow-xl flex items-center gap-2 border border-[#D4AF37]/50"
+        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <a
+            href={buildWhatsAppUrl()}
+            target="_blank"
+            rel="noreferrer"
+            className="bg-[#0B7A3D] hover:bg-[#096830] text-white px-6 py-3 rounded-full font-bold text-sm shadow-md flex items-center gap-2"
           >
-            <PackageCheck className="w-4 h-4 text-[#D4AF37]" />
-            <span>{language === 'en' ? 'Track Order Status Live' : 'تتبع شحنة الطلب مباشرة'}</span>
+            <MessageCircle className="w-4 h-4" />
+            <span>{language === 'en' ? 'Open WhatsApp Again' : 'فتح واتساب مرة أخرى'}</span>
+          </a>
+          <button
+            onClick={onOrderCompleted}
+            className="bg-[#7D0A0A] hover:bg-[#5A0707] text-white px-6 py-3 rounded-full font-bold text-sm shadow-xl border border-[#D4AF37]/50"
+          >
+            {language === 'en' ? 'Back to Home' : 'العودة للرئيسية'}
           </button>
         </div>
       </div>
@@ -153,7 +142,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, on
 
       <div className="border-b border-gray-100 dark:border-gray-800 pb-4 space-y-4">
         {/* Checkout Steps Progress Bar */}
-        <div className="flex items-center justify-between max-w-2xl mx-auto bg-gray-50 dark:bg-[#151111] p-3 rounded-2xl border border-gray-100 dark:border-gray-800 text-xs font-bold">
+        <div className="flex items-center justify-between max-w-xl mx-auto bg-gray-50 dark:bg-[#151111] p-3 rounded-2xl border border-gray-100 dark:border-gray-800 text-xs font-bold">
           <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400">
             <CheckCircle2 className="w-4 h-4" />
             <span>{language === 'en' ? '1. Gift Basket' : '١. السلة المختارة'}</span>
@@ -165,8 +154,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, on
           </div>
           <span className="text-gray-300">➔</span>
           <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
-            <CreditCard className="w-4 h-4" />
-            <span>{language === 'en' ? '3. Royal Payment' : '٣. الدفع الفاخر'}</span>
+            <MessageCircle className="w-4 h-4" />
+            <span>{language === 'en' ? '3. Send via WhatsApp' : '٣. الإرسال عبر واتساب'}</span>
           </div>
         </div>
 
@@ -176,17 +165,17 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, on
           </h1>
           <p className="text-xs text-gray-500">
             {language === 'en'
-              ? 'Enter delivery details and recipient address to choose your preferred payment option'
-              : 'أدخل تفاصيل التوصيل وعنوان المستلم لاختيار وسيلة الدفع المناسبة'}
+              ? 'Enter delivery details and recipient address — we\'ll prepare a WhatsApp message for you to send our team'
+              : 'أدخل تفاصيل التوصيل وعنوان المستلم، وسنجهز لك رسالة واتساب لإرسالها لفريقنا'}
           </p>
         </div>
       </div>
 
       <form onSubmit={handleSubmitOrder} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Left 2 Cols: Shipping & Payment */}
+
+        {/* Left 2 Cols: Sender & Recipient */}
         <div className="lg:col-span-2 space-y-6">
-          
+
           {/* Section 1: Customer Info */}
           <div className="bg-white dark:bg-[#151111] p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm space-y-4">
             <h3 className="font-bold font-heading text-base text-gray-900 dark:text-gray-100 flex items-center gap-2">
@@ -399,45 +388,6 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, on
             </div>
           </div>
 
-          {/* Section 3: Payment Methods */}
-          <div className="bg-white dark:bg-[#151111] p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm space-y-4">
-            <h3 className="font-bold font-heading text-base text-gray-900 dark:text-gray-100 flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-[#7D0A0A] dark:text-[#D4AF37]" />
-              <span>{language === 'en' ? '3. Royal Payment Method' : '٣. طريقة الدفع الفاخرة'}</span>
-            </h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {[
-                { id: 'apple_pay', title: 'Apple Pay', desc: language === 'en' ? 'Fast & secure one-click checkout' : 'دفع فوري سريع وآمن بنقرة واحدة' },
-                { id: 'thawani', title: 'Thawani Gateway (Oman)', desc: language === 'en' ? 'Direct local Omani digital payment gateway' : 'بوابة الدفع الإلكتروني المباشرة في سلطنة عمان' },
-                { id: 'visa', title: 'Visa / MasterCard', desc: language === 'en' ? 'Encrypted payment with any bank card' : 'دفع آمن مشفر بجميع البطاقات البنكية' },
-                { id: 'cod', title: 'Cash / Card on Delivery', desc: language === 'en' ? 'Pay cash or card upon courier delivery' : 'نقدياً أو بالبطاقة عند وصول المندوب' },
-              ].map((pm) => (
-                <div
-                  key={pm.id}
-                  onClick={() => setPaymentMethod(pm.id as any)}
-                  className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-start gap-3 ${
-                    paymentMethod === pm.id
-                      ? 'border-[#7D0A0A] bg-[#FCECEF]/40 dark:bg-[#7D0A0A]/20'
-                      : 'border-gray-200 dark:border-gray-800'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="pm"
-                    checked={paymentMethod === pm.id}
-                    onChange={() => {}}
-                    className="mt-1 accent-[#7D0A0A]"
-                  />
-                  <div>
-                    <h4 className="font-bold text-sm text-gray-900 dark:text-gray-100">{pm.title}</h4>
-                    <p className="text-[11px] text-gray-500 mt-0.5">{pm.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
         </div>
 
         {/* Right Col: Summary & Finish */}
@@ -468,43 +418,19 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onOrderCompleted, on
               </div>
             </div>
 
-            <div className="space-y-2">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-[#7D0A0A] hover:bg-[#5A0707] text-white py-3.5 rounded-2xl font-bold text-sm shadow-xl flex items-center justify-center gap-2 border border-[#D4AF37]/50 disabled:opacity-50"
-              >
-                {isSubmitting ? (
-                  <span className="animate-pulse">
-                    {language === 'en' ? 'Processing & Confirming Order...' : 'جاري تأكيد ومعالجة الطلب...'}
-                  </span>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4 text-[#D4AF37]" />
-                    <span>
-                      {language === 'en'
-                        ? `Complete Order Now (${formatPrice(cartTotal)})`
-                        : `تأكيد الطلب الآن (${formatPrice(cartTotal)})`}
-                    </span>
-                  </>
-                )}
-              </button>
+            <p className="text-[11px] text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-xl">
+              {language === 'en'
+                ? 'No online payment required. We confirm your order and arrange payment directly with you over WhatsApp.'
+                : 'لا حاجة للدفع الإلكتروني. سنؤكد طلبك ونرتب الدفع معك مباشرة عبر واتساب.'}
+            </p>
 
-              <button
-                type="button"
-                onClick={() => {
-                  const itemsList = cart.map(i => `- ${language === 'en' ? i.product.nameEn : i.product.nameAr} (x${i.quantity})`).join('\n');
-                  const msg = encodeURIComponent(
-                    `مرحباً عبق نزوى ✨ أود تأكيد الطلب المباشر:\n\n*المنتجات:*\n${itemsList}\n\n*المبلغ الإجمالي:* ${formatPrice(cartTotal)}\n*اسم العميل:* ${customerName} (${customerPhone})\n*المستلم:* ${isForSomeoneElse ? recipientName : customerName}\n*العنوان:* ${city} - ${area} (${street})\n*تاريخ التوصيل:* ${deliveryDate} (${deliveryTime})`
-                  );
-                  window.open(`https://wa.me/96891234567?text=${msg}`, '_blank');
-                }}
-                className="w-full bg-[#0B7A3D] hover:bg-[#096830] text-white py-3 rounded-2xl font-bold text-xs shadow-md flex items-center justify-center gap-2"
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>{language === 'en' ? 'Quick Confirm via WhatsApp' : 'تأكيد سريع عبر الواتساب 💬'}</span>
-              </button>
-            </div>
+            <button
+              type="submit"
+              className="w-full bg-[#0B7A3D] hover:bg-[#096830] text-white py-3.5 rounded-2xl font-bold text-sm shadow-xl flex items-center justify-center gap-2"
+            >
+              <MessageCircle className="w-4 h-4" />
+              <span>{language === 'en' ? 'Send Order via WhatsApp' : 'إرسال الطلب عبر واتساب'}</span>
+            </button>
           </div>
         </div>
 
