@@ -19,6 +19,7 @@ import {
   Send,
   UserCheck
 } from 'lucide-react';
+import fallbackImg from '../assets/images/royal_flower_bouquet_1785404632631.jpg';
 
 interface ProductDetailsPageProps {
   product: Product;
@@ -127,7 +128,6 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
     setShowReviewModal(false);
   };
 
-  const fallbackImg = '/src/assets/images/royal_flower_bouquet_1785404632631.jpg';
   const currentImg = product.images[selectedImgIndex] || product.images[0] || fallbackImg;
 
   return (
@@ -152,6 +152,8 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
               src={currentImg}
               alt={title}
               referrerPolicy="no-referrer"
+              fetchPriority="high"
+              decoding="async"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = fallbackImg;
               }}
@@ -160,6 +162,7 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
 
             <button
               onClick={() => toggleWishlist(product)}
+              aria-label={language === 'en' ? 'Toggle wishlist' : 'إضافة إلى المفضلة'}
               className={`absolute top-4 right-4 p-3 rounded-full shadow-md transition-all ${
                 isLiked ? 'bg-[#7D0A0A] text-white' : 'bg-white/80 dark:bg-black/60 text-gray-700'
               }`}
@@ -184,6 +187,8 @@ export const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
                   <img
                     src={img}
                     alt=""
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"
                     onError={(e) => {

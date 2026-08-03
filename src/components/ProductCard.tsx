@@ -3,6 +3,7 @@ import { Product } from '../types';
 import { useStore } from '../context/StoreContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Heart, ShoppingBag, Eye, Star, Sparkles } from 'lucide-react';
+import fallbackImg from '../assets/images/royal_flower_bouquet_1785404632631.jpg';
 
 interface ProductCardProps {
   product: Product;
@@ -22,7 +23,6 @@ export const ProductCardComponent: React.FC<ProductCardProps> = ({
   const isLiked = isInWishlist(product.id);
 
   const [imgSrc, setImgSrc] = useState(product.images[0]);
-  const fallbackImg = '/src/assets/images/royal_flower_bouquet_1785404632631.jpg';
 
   const title = language === 'ar' ? product.nameAr : product.nameEn;
   const description = language === 'ar' ? product.descriptionAr : product.descriptionEn;

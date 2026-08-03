@@ -191,6 +191,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
             {/* Cart Button */}
             <button
               onClick={() => handleNavClick('cart')}
+              aria-label={t('nav_cart')}
               className="bg-[#7D0A0A] hover:bg-[#5A0707] text-white px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full flex items-center gap-1.5 shadow-sm transition-all transform active:scale-95"
             >
               <ShoppingBag className="w-4 h-4 text-[#D4AF37]" />
@@ -215,6 +216,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={language === 'en' ? 'Toggle menu' : 'فتح القائمة'}
+              aria-expanded={mobileMenuOpen}
               className="lg:hidden p-1.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
@@ -239,6 +242,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
+                  aria-label={language === 'en' ? 'Clear search' : 'مسح البحث'}
                   className="absolute left-3.5 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                 >
                   <X className="w-4 h-4" />
