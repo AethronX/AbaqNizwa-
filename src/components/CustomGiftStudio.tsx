@@ -211,7 +211,7 @@ export const CustomGiftStudio: React.FC<CustomGiftStudioProps> = ({ onGoToCart }
                         : 'border-gray-200 dark:border-gray-800 hover:border-gray-300'
                     }`}
                   >
-                    <img src={base.image} alt={base.nameAr} className="w-20 h-20 rounded-xl object-cover shrink-0" />
+                    <img src={base.image} alt={base.nameAr} loading="lazy" decoding="async" className="w-20 h-20 rounded-xl object-cover shrink-0" />
                     <div>
                       <h3 className="font-bold text-sm text-gray-900 dark:text-gray-100">{base.nameAr}</h3>
                       <p className="text-xs text-gray-500 mt-1">{base.nameEn}</p>

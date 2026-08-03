@@ -1,13 +1,12 @@
 import { Product, Category, Occasion, Review, Coupon, Banner, Customer, Order } from '../types';
-
-const heroImg = '/src/assets/images/nizwa_hero_banner_1785404588402.jpg';
-const perfumeImg = '/src/assets/images/niche_perfume_bottle_1785404603274.jpg';
-const chocolatesImg = '/src/assets/images/luxury_chocolate_box_1785404617822.jpg';
-const bouquetImg = '/src/assets/images/royal_flower_bouquet_1785404632631.jpg';
-const customGiftImg = '/src/assets/images/custom_gift_box_1785404645530.jpg';
-const gradImg = '/src/assets/images/graduation_gift_box_1785418508669.jpg';
-const weddingImg = '/src/assets/images/wedding_gift_tray_1785418525419.jpg';
-const babyImg = '/src/assets/images/baby_gift_hamper_1785418538188.jpg';
+import heroImg from '../assets/images/nizwa_hero_banner_1785404588402.jpg';
+import perfumeImg from '../assets/images/niche_perfume_bottle_1785404603274.jpg';
+import chocolatesImg from '../assets/images/luxury_chocolate_box_1785404617822.jpg';
+import bouquetImg from '../assets/images/royal_flower_bouquet_1785404632631.jpg';
+import customGiftImg from '../assets/images/custom_gift_box_1785404645530.jpg';
+import gradImg from '../assets/images/graduation_gift_box_1785418508669.jpg';
+import weddingImg from '../assets/images/wedding_gift_tray_1785418525419.jpg';
+import babyImg from '../assets/images/baby_gift_hamper_1785418538188.jpg';
 
 export const CATEGORIES: Category[] = [
   {

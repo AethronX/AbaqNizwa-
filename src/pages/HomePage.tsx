@@ -5,6 +5,9 @@ import { ProductCard } from '../components/ProductCard';
 import { ProductQuickViewModal } from '../components/ProductQuickViewModal';
 import { CATEGORIES, OCCASIONS, BANNERS, INSTAGRAM_POSTS } from '../data/mockData';
 import { Product } from '../types';
+import heroFallbackImg from '../assets/images/nizwa_hero_banner_1785404588402.jpg';
+import bouquetFallbackImg from '../assets/images/royal_flower_bouquet_1785404632631.jpg';
+import customGiftStudioImg from '../assets/images/abaq_hero_banner_1785401665275.jpg';
 import {
   Sparkles,
   ArrowLeft,
@@ -62,8 +65,10 @@ export const HomePage: React.FC<HomePageProps> = ({ setActiveTab, onSelectProduc
               src={currentBanner.image}
               alt={currentBanner.titleAr}
               referrerPolicy="no-referrer"
+              fetchPriority="high"
+              decoding="async"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = '/src/assets/images/nizwa_hero_banner_1785404588402.jpg';
+                (e.target as HTMLImageElement).src = heroFallbackImg;
               }}
               className="w-full h-full object-cover object-center filter brightness-65 scale-105 transition-all duration-1000 ease-out"
             />
@@ -126,16 +131,20 @@ export const HomePage: React.FC<HomePageProps> = ({ setActiveTab, onSelectProduc
           {/* Carousel Pagination & Arrows */}
           <div className="absolute bottom-8 left-4 right-4 sm:left-8 sm:right-8 z-20 flex items-center justify-between pointer-events-none">
             {/* Dots */}
-            <div className="flex items-center gap-2 pointer-events-auto bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+            <div className="flex items-center pointer-events-auto bg-black/40 backdrop-blur-md px-1 py-1.5 rounded-full border border-white/10">
               {BANNERS.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => setCurrentBannerIndex(idx)}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    currentBannerIndex === idx ? 'w-6 bg-[#D4AF37]' : 'w-2 bg-white/40 hover:bg-white/70'
-                  }`}
+                  className="p-2 flex items-center justify-center"
                   aria-label={`Go to banner ${idx + 1}`}
-                />
+                >
+                  <span
+                    className={`block h-2 rounded-full transition-all duration-300 ${
+                      currentBannerIndex === idx ? 'w-6 bg-[#D4AF37]' : 'w-2 bg-white/40 hover:bg-white/70'
+                    }`}
+                  />
+                </button>
               ))}
             </div>
 
@@ -168,9 +177,9 @@ export const HomePage: React.FC<HomePageProps> = ({ setActiveTab, onSelectProduc
               <Truck className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="font-bold text-xs sm:text-sm text-gray-900 dark:text-gray-100">
+              <p className="font-bold text-xs sm:text-sm text-gray-900 dark:text-gray-100">
                 {language === 'en' ? 'Same-Day Express Delivery' : 'توصيل سريع بنفس اليوم'}
-              </h4>
+              </p>
               <p className="text-[11px] text-gray-500 dark:text-gray-400">
                 {language === 'en' ? 'Across all governorates in Oman' : 'في كافة محافظات عمان'}
               </p>
@@ -182,9 +191,9 @@ export const HomePage: React.FC<HomePageProps> = ({ setActiveTab, onSelectProduc
               <Flower2 className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="font-bold text-xs sm:text-sm text-gray-900 dark:text-gray-100">
+              <p className="font-bold text-xs sm:text-sm text-gray-900 dark:text-gray-100">
                 {language === 'en' ? '100% Fresh Roses Daily' : 'ورد طازج 100% يومياً'}
-              </h4>
+              </p>
               <p className="text-[11px] text-gray-500 dark:text-gray-400">
                 {language === 'en' ? 'Imported from premier global farms' : 'مستورد من أفضل المزارع العالمية'}
               </p>
@@ -196,9 +205,9 @@ export const HomePage: React.FC<HomePageProps> = ({ setActiveTab, onSelectProduc
               <Gift className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="font-bold text-xs sm:text-sm text-gray-900 dark:text-gray-100">
+              <p className="font-bold text-xs sm:text-sm text-gray-900 dark:text-gray-100">
                 {language === 'en' ? 'Royal Gift Wrapping' : 'تغليف ملكي فاخر'}
-              </h4>
+              </p>
               <p className="text-[11px] text-gray-500 dark:text-gray-400">
                 {language === 'en' ? 'Personalized velvet gift cards' : 'بطاقات إهداء مخصصة ومخملية'}
               </p>
@@ -210,9 +219,9 @@ export const HomePage: React.FC<HomePageProps> = ({ setActiveTab, onSelectProduc
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="font-bold text-xs sm:text-sm text-gray-900 dark:text-gray-100">
+              <p className="font-bold text-xs sm:text-sm text-gray-900 dark:text-gray-100">
                 {language === 'en' ? '100% Secure Payment' : 'دفع آمن ومضمون 100%'}
-              </h4>
+              </p>
               <p className="text-[11px] text-gray-500 dark:text-gray-400">
                 {language === 'en' ? 'Thawani & Debit Card Options' : 'عبر ثواني والبطاقات البنكية'}
               </p>
@@ -259,8 +268,10 @@ export const HomePage: React.FC<HomePageProps> = ({ setActiveTab, onSelectProduc
                 src={cat.image}
                 alt={language === 'en' ? cat.nameEn : cat.nameAr}
                 referrerPolicy="no-referrer"
+                loading="lazy"
+                decoding="async"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/src/assets/images/royal_flower_bouquet_1785404632631.jpg';
+                  (e.target as HTMLImageElement).src = bouquetFallbackImg;
                 }}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
               />
@@ -354,9 +365,10 @@ export const HomePage: React.FC<HomePageProps> = ({ setActiveTab, onSelectProduc
 
           <div className="relative rounded-2xl overflow-hidden aspect-[4/3] border border-white/10 shadow-lg">
             <img
-              src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=800&q=80"
+              src={customGiftStudioImg}
               alt="Custom Gift Studio"
-              referrerPolicy="no-referrer"
+              loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover"
             />
           </div>
@@ -388,6 +400,8 @@ export const HomePage: React.FC<HomePageProps> = ({ setActiveTab, onSelectProduc
                   src={occ.image}
                   alt={language === 'en' ? occ.nameEn : occ.nameAr}
                   referrerPolicy="no-referrer"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
               </div>
@@ -430,7 +444,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setActiveTab, onSelectProduc
                 </div>
                 <div className="pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs">
                   <div>
-                    <h4 className="font-bold text-gray-900 dark:text-gray-100">{rev.userName}</h4>
+                    <p className="font-bold text-gray-900 dark:text-gray-100">{rev.userName}</p>
                     <span className="text-[10px] text-gray-400">{rev.city}</span>
                   </div>
                   <span className="text-[10px] text-emerald-600 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full font-semibold">
@@ -474,8 +488,10 @@ export const HomePage: React.FC<HomePageProps> = ({ setActiveTab, onSelectProduc
             >
               <img
                 src={post.image}
-                alt=""
+                alt={language === 'en' ? post.captionEn : post.captionAr}
                 referrerPolicy="no-referrer"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-3">

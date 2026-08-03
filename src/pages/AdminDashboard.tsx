@@ -255,7 +255,7 @@ export const AdminDashboard: React.FC = () => {
                   key={p.id}
                   className="p-4 rounded-2xl border border-gray-100 dark:border-gray-800 flex gap-4 items-center bg-gray-50/50 dark:bg-gray-800/30"
                 >
-                  <img src={p.images[0]} alt="" className="w-16 h-16 rounded-xl object-cover" referrerPolicy="no-referrer" />
+                  <img src={p.images[0]} alt={pName} loading="lazy" decoding="async" className="w-16 h-16 rounded-xl object-cover" referrerPolicy="no-referrer" />
                   <div className="flex-1 space-y-1 text-xs">
                     <h4 className="font-bold text-gray-900 dark:text-gray-100">{pName}</h4>
                     <p className="text-[#7D0A0A] dark:text-[#D4AF37] font-bold">{formatPrice(p.price)}</p>

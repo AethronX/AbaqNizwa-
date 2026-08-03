@@ -3,6 +3,7 @@ import { Product } from '../types';
 import { useStore } from '../context/StoreContext';
 import { useLanguage } from '../context/LanguageContext';
 import { X, Star, Heart, ShoppingBag, Truck, Calendar, Sparkles } from 'lucide-react';
+import fallbackImg from '../assets/images/royal_flower_bouquet_1785404632631.jpg';
 
 interface ProductQuickViewModalProps {
   product: Product;
@@ -31,7 +32,6 @@ export const ProductQuickViewModal: React.FC<ProductQuickViewModalProps> = ({
   const title = language === 'ar' ? product.nameAr : product.nameEn;
   const description = language === 'ar' ? product.descriptionAr : product.descriptionEn;
 
-  const fallbackImg = '/src/assets/images/royal_flower_bouquet_1785404632631.jpg';
   const currentImg = product.images[selectedImageIndex] || product.images[0] || fallbackImg;
 
   const handleAddToCart = () => {
@@ -50,6 +50,7 @@ export const ProductQuickViewModal: React.FC<ProductQuickViewModalProps> = ({
         {/* Close Button */}
         <button
           onClick={onClose}
+          aria-label={language === 'en' ? 'Close' : 'إغلاق'}
           className="absolute top-4 left-4 p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-[#7D0A0A] hover:text-white transition-colors z-20"
         >
           <X className="w-5 h-5" />

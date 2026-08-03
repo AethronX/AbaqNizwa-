@@ -103,6 +103,8 @@ export const CartPage: React.FC<CartPageProps> = ({ setActiveTab, onProceedCheck
                     src={item.product.images[0]}
                     alt={itemName}
                     referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
                     className="w-20 h-20 rounded-xl object-cover shrink-0 border border-gray-100 dark:border-gray-800"
                   />
                   <div className="space-y-1 text-xs">
