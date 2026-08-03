@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Product } from '../types';
 import { useStore } from '../context/StoreContext';
 import { useLanguage } from '../context/LanguageContext';
-import { ShoppingBag, Eye, Star, Sparkles } from 'lucide-react';
+import { ShoppingBag, Eye, Sparkles } from 'lucide-react';
 import fallbackImg from '../assets/images/royal_flower_bouquet_1785404632631.jpg';
 
 interface ProductCardProps {
@@ -95,16 +95,11 @@ export const ProductCardComponent: React.FC<ProductCardProps> = ({
       {/* Product Information */}
       <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
         <div>
-          {/* Category Subtext & Rating */}
-          <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+          {/* Category Subtext */}
+          <div className="flex items-center text-xs text-gray-500 mb-1">
             <span className="text-[#8C6914] dark:text-[#D4AF37] font-semibold text-[11px] uppercase tracking-wider">
               {product.category}
             </span>
-            <div className="flex items-center gap-1 text-amber-700 dark:text-amber-500 font-bold">
-              <Star className="w-3.5 h-3.5 fill-amber-400" />
-              <span>{product.rating}</span>
-              <span className="text-gray-500 dark:text-gray-400 text-[10px]">({product.reviewsCount})</span>
-            </div>
           </div>
 
           {/* Product Title */}

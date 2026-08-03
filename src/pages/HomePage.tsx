@@ -31,7 +31,7 @@ interface HomePageProps {
 }
 
 export const HomePage: React.FC<HomePageProps> = ({ setActiveTab, onSelectProduct }) => {
-  const { products, reviews } = useStore();
+  const { products } = useStore();
   const { t, language } = useLanguage();
 
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
@@ -113,13 +113,6 @@ export const HomePage: React.FC<HomePageProps> = ({ setActiveTab, onSelectProduc
 
               {/* Trust Badge Social Proof */}
               <div className="pt-3 flex flex-wrap items-center gap-4 text-xs text-gray-300 border-t border-white/10 max-w-lg">
-                <div className="flex items-center gap-1 text-[#D4AF37]">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-[#D4AF37] text-[#D4AF37]" />
-                  ))}
-                  <span className="font-bold ml-1 text-white">4.9/5</span>
-                </div>
-                <span className="text-gray-400">|</span>
                 <span className="text-gray-200 font-medium">
                   {language === 'en' ? 'Trusted by 5,000+ Happy Clients in Oman 🇴🇲' : 'أكثر من 5,000+ زبون سعيد في سلطنة عمان 🇴🇲'}
                 </span>
@@ -413,49 +406,6 @@ export const HomePage: React.FC<HomePageProps> = ({ setActiveTab, onSelectProduc
         </div>
       </section>
 
-      {/* CUSTOMER TESTIMONIALS CAROUSEL */}
-      <section className="bg-[#FCECEF]/40 dark:bg-[#120E0E] py-16 border-y border-[#7D0A0A]/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="text-center max-w-xl mx-auto space-y-2">
-            <div className="inline-flex items-center gap-1.5 text-[#7D0A0A] dark:text-[#D4AF37] text-xs font-bold">
-              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-              <span>{language === 'en' ? 'Customer Reviews & Experiences' : 'آراء وتجارب العملاء'}</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-gray-900 dark:text-gray-100">
-              {t('reviews_title')}
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {reviews.map((rev) => (
-              <div
-                key={rev.id}
-                className="bg-white dark:bg-[#1A1414] p-6 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm space-y-3 flex flex-col justify-between"
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center gap-1 text-amber-400">
-                    {[...Array(rev.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-amber-400" />
-                    ))}
-                  </div>
-                  <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed italic">
-                    "{rev.comment}"
-                  </p>
-                </div>
-                <div className="pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs">
-                  <div>
-                    <p className="font-bold text-gray-900 dark:text-gray-100">{rev.userName}</p>
-                    <span className="text-[10px] text-gray-500 dark:text-gray-400">{rev.city}</span>
-                  </div>
-                  <span className="text-[10px] text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full font-semibold">
-                    {language === 'en' ? 'Verified Buyer ✓' : 'مشتري مؤكد ✓'}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* INSTAGRAM FEED SECTION */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">

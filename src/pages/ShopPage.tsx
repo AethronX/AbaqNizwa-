@@ -24,9 +24,8 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onSelectProduct }) => {
 
   const [selectedOccasion, setSelectedOccasion] = useState('all');
   const [maxPrice, setMaxPrice] = useState(200);
-  const [minRating, setMinRating] = useState(0);
   const [inStockOnly, setInStockOnly] = useState(false);
-  const [sortBy, setSortBy] = useState<'featured' | 'price-asc' | 'price-desc' | 'rating'>('featured');
+  const [sortBy, setSortBy] = useState<'featured' | 'price-asc' | 'price-desc'>('featured');
 
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
@@ -58,11 +57,6 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onSelectProduct }) => {
         return false;
       }
 
-      // Rating
-      if (p.rating < minRating) {
-        return false;
-      }
-
       // Stock
       if (inStockOnly && !p.inStock) {
         return false;
@@ -72,16 +66,14 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onSelectProduct }) => {
     }).sort((a, b) => {
       if (sortBy === 'price-asc') return a.price - b.price;
       if (sortBy === 'price-desc') return b.price - a.price;
-      if (sortBy === 'rating') return b.rating - a.rating;
       return 0; // featured
     });
-  }, [products, searchQuery, selectedCategoryFilter, selectedOccasion, maxPrice, minRating, inStockOnly, sortBy]);
+  }, [products, searchQuery, selectedCategoryFilter, selectedOccasion, maxPrice, inStockOnly, sortBy]);
 
   const resetFilters = () => {
     setSelectedCategoryFilter('all');
     setSelectedOccasion('all');
     setMaxPrice(200);
-    setMinRating(0);
     setInStockOnly(false);
     setSearchQuery('');
   };
@@ -116,7 +108,6 @@ export const ShopPage: React.FC<ShopPageProps> = ({ onSelectProduct }) => {
               <option value="featured">{language === 'en' ? 'Featured & VIP' : 'الأبرز والـ VIP'}</option>
               <option value="price-asc">{language === 'en' ? 'Price: Low to High' : 'السعر: من الأقل إلى الأعلى'}</option>
               <option value="price-desc">{language === 'en' ? 'Price: High to Low' : 'السعر: من الأعلى إلى الأقل'}</option>
-              <option value="rating">{language === 'en' ? 'Highest Rated' : 'الأعلى تقييماً'}</option>
             </select>
           </div>
 

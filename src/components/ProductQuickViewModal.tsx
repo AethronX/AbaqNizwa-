@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Product } from '../types';
 import { useStore } from '../context/StoreContext';
 import { useLanguage } from '../context/LanguageContext';
-import { X, Star, ShoppingBag, Truck, Calendar, Sparkles } from 'lucide-react';
+import { X, ShoppingBag, Truck, Calendar, Sparkles } from 'lucide-react';
 import fallbackImg from '../assets/images/royal_flower_bouquet_1785404632631.jpg';
 
 interface ProductQuickViewModalProps {
@@ -96,14 +96,6 @@ export const ProductQuickViewModal: React.FC<ProductQuickViewModalProps> = ({
           {/* Details */}
           <div className="space-y-4 flex flex-col justify-between">
             <div>
-              <div className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-500 font-bold mb-1">
-                <div className="flex items-center">
-                  <Star className="w-4 h-4 fill-amber-400" />
-                  <span className="mr-1">{product.rating}</span>
-                </div>
-                <span className="text-gray-500 dark:text-gray-400">({product.reviewsCount} تقييم)</span>
-              </div>
-
               <h2 className="text-xl font-bold font-heading text-gray-900 dark:text-gray-100">
                 {title}
               </h2>

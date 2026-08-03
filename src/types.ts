@@ -11,8 +11,6 @@ export interface Product {
   originalPrice?: number;
   category: string;
   occasionId?: string;
-  rating: number;
-  reviewsCount: number;
   images: string[];
   isBestSeller?: boolean;
   isNew?: boolean;
@@ -103,19 +101,6 @@ export interface Order {
   couponCode?: string;
 }
 
-export interface Review {
-  id: string;
-  productId: string;
-  productNameAr: string;
-  productNameEn: string;
-  userName: string;
-  userAvatar?: string;
-  rating: number;
-  comment: string;
-  date: string;
-  verified: boolean;
-  city: string;
-}
 
 export interface Coupon {
   id: string;
