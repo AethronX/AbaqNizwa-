@@ -11,13 +11,9 @@ import {
   Sun,
   Moon,
   Globe,
-  ShieldCheck,
   User,
   Sparkles,
   Flower2,
-  PackageCheck,
-  Truck,
-  Instagram
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -27,7 +23,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
-  const { language, setLanguage, dir, t } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
   const { theme, toggleTheme } = useTheme();
   const {
     cart,
@@ -52,23 +48,78 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const navLinks = [
+  // Core destinations get top billing in the main bar; secondary utility
+  // links (help/support-style pages) move into a slim strip above it —
+  // keeps the primary bar to a scannable handful of items.
+  const primaryLinks = [
     { id: 'home', label: t('nav_home') },
     { id: 'shop', label: t('nav_shop') },
     { id: 'categories', label: t('nav_categories') },
-    { id: 'custom-gift', label: t('nav_custom_gift'), highlight: true },
     { id: 'occasions', label: t('nav_occasions') },
+  ];
+  const utilityLinks = [
     { id: 'track-order', label: t('nav_track_order') },
     { id: 'about', label: t('nav_about') },
     { id: 'contact', label: t('nav_contact') },
   ];
+  const mobileLinks: { id: string; label: string; highlight?: boolean }[] = [
+    ...primaryLinks,
+    { id: 'custom-gift', label: t('nav_custom_gift'), highlight: true },
+    ...utilityLinks,
+  ];
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#0D0A0A]/95 backdrop-blur-md border-b border-[#7D0A0A]/10 dark:border-white/10 transition-colors">
-      {/* Main Top Bar */}
+      {/* Utility Strip: language / currency / theme / support links — desktop only */}
+      <div className="hidden lg:block border-b border-[#7D0A0A]/10 dark:border-white/10 bg-[#FBF6F3] dark:bg-[#0A0707]">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 h-9 flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            {utilityLinks.map((link) => (
+              <button
+                key={link.id}
+                onClick={() => handleNavClick(link.id)}
+                className="text-[11.5px] font-medium text-gray-500 dark:text-gray-400 hover:text-[#7D0A0A] dark:hover:text-[#D4AF37] transition-colors"
+              >
+                {link.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-4 text-[11.5px]">
+            <button
+              onClick={toggleTheme}
+              className="flex items-center text-gray-500 dark:text-gray-400 hover:text-[#7D0A0A] dark:hover:text-[#D4AF37] transition-colors"
+              title="تغيير المظهر"
+            >
+              {theme === 'light' ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5 text-[#D4AF37]" />}
+            </button>
+            <span className="w-px h-3 bg-gray-300 dark:bg-gray-700" />
+            <button
+              onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
+              className="flex items-center gap-1 font-bold uppercase text-gray-500 dark:text-gray-400 hover:text-[#7D0A0A] dark:hover:text-[#D4AF37] transition-colors"
+              title="تغيير اللغة"
+            >
+              <Globe className="w-3.5 h-3.5" />
+              {language === 'ar' ? 'EN' : 'عربي'}
+            </button>
+            <span className="w-px h-3 bg-gray-300 dark:bg-gray-700" />
+            <select
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value as any)}
+              className="bg-transparent font-bold text-gray-500 dark:text-gray-400 hover:text-[#7D0A0A] dark:hover:text-[#D4AF37] cursor-pointer focus:outline-none transition-colors"
+            >
+              <option value="OMR">ر.ع. (OMR)</option>
+              <option value="SAR">ر.س (SAR)</option>
+              <option value="USD">$ (USD)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Bar */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-20">
-          
+        <div className="flex items-center justify-between h-16 sm:h-20 gap-3">
+
           {/* Logo */}
           <button
             onClick={() => handleNavClick('home')}
@@ -87,71 +138,43 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
             </div>
           </button>
 
-          {/* Desktop Nav Links */}
-          <nav className="hidden lg:flex items-center gap-7">
-            {navLinks.map((link) => (
+          {/* Desktop Primary Nav */}
+          <nav className="hidden lg:flex items-center gap-8">
+            {primaryLinks.map((link) => (
               <button
                 key={link.id}
                 onClick={() => handleNavClick(link.id)}
-                className={`text-sm font-medium transition-all relative py-1 ${
+                className={`text-[14.5px] font-semibold tracking-wide transition-colors relative py-1 ${
                   activeTab === link.id
-                    ? 'text-[#7D0A0A] dark:text-[#D4AF37] font-semibold'
+                    ? 'text-[#7D0A0A] dark:text-[#D4AF37]'
                     : 'text-gray-700 dark:text-gray-300 hover:text-[#7D0A0A] dark:hover:text-[#D4AF37]'
                 }`}
               >
-                {link.highlight ? (
-                  <span className="px-2.5 py-1 rounded-full bg-[#FCECEF] dark:bg-[#7D0A0A]/30 text-[#7D0A0A] dark:text-[#D4AF37] border border-[#7D0A0A]/20 flex items-center gap-1 shadow-sm">
-                    <Sparkles className="w-3 h-3 text-[#D4AF37]" />
-                    {link.label}
-                  </span>
-                ) : (
-                  link.label
-                )}
-                {activeTab === link.id && !link.highlight && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#7D0A0A] dark:bg-[#D4AF37] rounded-full" />
-                )}
+                {link.label}
+                <span
+                  className={`absolute -bottom-1 left-0 right-0 h-0.5 bg-[#7D0A0A] dark:bg-[#D4AF37] rounded-full origin-center transition-transform duration-200 ${
+                    activeTab === link.id ? 'scale-x-100' : 'scale-x-0'
+                  }`}
+                />
               </button>
             ))}
           </nav>
 
+          {/* Custom Gift Studio — distinct CTA, not a plain nav link */}
+          <button
+            onClick={() => handleNavClick('custom-gift')}
+            className={`hidden lg:flex items-center gap-1.5 px-4 py-2 rounded-full border text-[13px] font-bold transition-all shrink-0 ${
+              activeTab === 'custom-gift'
+                ? 'bg-[#7D0A0A] border-[#7D0A0A] text-white shadow-md'
+                : 'bg-gradient-to-r from-[#FCECEF] to-white dark:from-[#7D0A0A]/25 dark:to-transparent border-[#D4AF37]/50 text-[#7D0A0A] dark:text-[#D4AF37] hover:border-[#D4AF37] hover:shadow-md'
+            }`}
+          >
+            <Sparkles className={`w-3.5 h-3.5 ${activeTab === 'custom-gift' ? 'text-[#D4AF37]' : 'text-[#D4AF37]'}`} />
+            {t('nav_custom_gift')}
+          </button>
+
           {/* Action Icons */}
-          <div className="flex items-center gap-1 sm:gap-3">
-            
-            {/* Currency Switcher (Hidden on small mobile, accessible in drawer) */}
-            <select
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value as any)}
-              className="hidden sm:inline-block bg-gray-100 dark:bg-[#1A1515] text-xs font-semibold px-2 py-1.5 rounded-md border border-gray-200 dark:border-gray-800 text-gray-800 dark:text-gray-200 cursor-pointer focus:outline-none"
-            >
-              <option value="OMR">ر.ع. (OMR)</option>
-              <option value="SAR">ر.س (SAR)</option>
-              <option value="USD">$ (USD)</option>
-            </select>
-
-            {/* Language Switcher */}
-            <button
-              onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
-              className="p-1.5 sm:p-2 rounded-full hover:bg-gray-100 dark:hover:bg-[#1A1515] text-gray-700 dark:text-gray-300 transition-colors flex items-center gap-1 text-xs font-bold"
-              title="تغيير اللغة"
-            >
-              <Globe className="w-4 h-4 text-[#7D0A0A] dark:text-[#D4AF37]" />
-              <span className="uppercase text-[11px] sm:text-xs">{language === 'ar' ? 'EN' : 'عربي'}</span>
-            </button>
-
-            {/* Dark / Light Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="p-1.5 sm:p-2 rounded-full hover:bg-gray-100 dark:hover:bg-[#1A1515] text-gray-700 dark:text-gray-300 transition-colors"
-              title="تغيير المظهر"
-            >
-              {theme === 'light' ? (
-                <Moon className="w-4 h-4 text-gray-700" />
-              ) : (
-                <Sun className="w-4 h-4 text-[#D4AF37]" />
-              )}
-            </button>
-
-            {/* Search Trigger Button */}
+          <div className="flex items-center gap-0.5 sm:gap-1 ms-auto lg:ms-0">
             <button
               onClick={() => {
                 setSearchOpen(!searchOpen);
@@ -159,13 +182,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
                   setActiveTab('shop');
                 }
               }}
-              className="p-1.5 sm:p-2 rounded-full hover:bg-gray-100 dark:hover:bg-[#1A1515] text-gray-700 dark:text-gray-300 transition-colors relative"
+              className="p-1.5 sm:p-2 rounded-full hover:bg-gray-100 dark:hover:bg-[#1A1515] text-gray-700 dark:text-gray-300 transition-colors"
               title="بحث في المتجر"
             >
-              <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700 dark:text-gray-300 hover:text-[#7D0A0A]" />
+              <Search className="w-4 h-4 sm:w-5 sm:h-5 hover:text-[#7D0A0A]" />
             </button>
 
-            {/* Wishlist Button (Hidden on small screens since it's in bottom bar) */}
             <button
               onClick={() => handleNavClick('wishlist')}
               className="hidden sm:flex p-2 rounded-full hover:bg-gray-100 dark:hover:bg-[#1A1515] text-gray-700 dark:text-gray-300 transition-colors relative"
@@ -179,7 +201,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
               )}
             </button>
 
-            {/* Account Icon */}
             <button
               onClick={() => handleNavClick('account')}
               className="hidden sm:flex p-2 rounded-full hover:bg-gray-100 dark:hover:bg-[#1A1515] text-gray-700 dark:text-gray-300 transition-colors"
@@ -187,43 +208,45 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
             >
               <User className="w-5 h-5" />
             </button>
-
-            {/* Cart Button */}
-            <button
-              onClick={() => handleNavClick('cart')}
-              aria-label={t('nav_cart')}
-              className="bg-[#7D0A0A] hover:bg-[#5A0707] text-white px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full flex items-center gap-1.5 shadow-sm transition-all transform active:scale-95"
-            >
-              <ShoppingBag className="w-4 h-4 text-[#D4AF37]" />
-              <span className="text-xs font-semibold hidden sm:inline">{t('nav_cart')}</span>
-              {totalCartCount > 0 && (
-                <span className="bg-[#D4AF37] text-[#7D0A0A] font-bold text-[10px] sm:text-xs px-1.5 py-0.2 rounded-full">
-                  {totalCartCount}
-                </span>
-              )}
-            </button>
-
-            {/* Admin shortcut if admin mode */}
-            {isAdmin && (
-              <button
-                onClick={() => handleNavClick('admin')}
-                className="hidden sm:inline-block bg-[#D4AF37] text-[#7D0A0A] font-bold px-2.5 py-1 rounded-md text-xs border border-[#7D0A0A]/30 shadow-sm"
-              >
-                الأدمن
-              </button>
-            )}
-
-            {/* Mobile Menu Toggle */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label={language === 'en' ? 'Toggle menu' : 'فتح القائمة'}
-              aria-expanded={mobileMenuOpen}
-              className="lg:hidden p-1.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
-            </button>
-
           </div>
+
+          <span className="hidden sm:block w-px h-6 bg-gray-200 dark:bg-gray-800" />
+
+          {/* Cart Button */}
+          <button
+            onClick={() => handleNavClick('cart')}
+            aria-label={t('nav_cart')}
+            className="bg-[#7D0A0A] hover:bg-[#5A0707] text-white px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full flex items-center gap-1.5 shadow-sm transition-all transform active:scale-95 shrink-0"
+          >
+            <ShoppingBag className="w-4 h-4 text-[#D4AF37]" />
+            <span className="text-xs font-semibold hidden sm:inline">{t('nav_cart')}</span>
+            {totalCartCount > 0 && (
+              <span className="bg-[#D4AF37] text-[#7D0A0A] font-bold text-[10px] sm:text-xs px-1.5 py-0.2 rounded-full">
+                {totalCartCount}
+              </span>
+            )}
+          </button>
+
+          {/* Admin shortcut if admin mode */}
+          {isAdmin && (
+            <button
+              onClick={() => handleNavClick('admin')}
+              className="hidden sm:inline-block bg-[#D4AF37] text-[#7D0A0A] font-bold px-2.5 py-1 rounded-md text-xs border border-[#7D0A0A]/30 shadow-sm shrink-0"
+            >
+              الأدمن
+            </button>
+          )}
+
+          {/* Mobile Menu Toggle */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={language === 'en' ? 'Toggle menu' : 'فتح القائمة'}
+            aria-expanded={mobileMenuOpen}
+            className="lg:hidden p-1.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 shrink-0"
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
+          </button>
+
         </div>
 
         {/* Live Search Bar Popup */}
@@ -256,7 +279,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white dark:bg-[#120E0E] border-t border-gray-200 dark:border-gray-800 px-4 pt-3 pb-6 space-y-2 animate-fadeIn">
-          {navLinks.map((link) => (
+          {mobileLinks.map((link) => (
             <button
               key={link.id}
               onClick={() => handleNavClick(link.id)}
@@ -274,20 +297,25 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
               )}
             </button>
           ))}
-          <div className="pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs text-gray-500">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5">
-                <span className="font-medium text-gray-700 dark:text-gray-300">العملة:</span>
-                <select
-                  value={currency}
-                  onChange={(e) => setCurrency(e.target.value as any)}
-                  className="bg-gray-100 dark:bg-[#1A1515] text-xs font-semibold px-2 py-1 rounded-md border border-gray-200 dark:border-gray-800 text-gray-800 dark:text-gray-200"
-                >
-                  <option value="OMR">ر.ع. (OMR)</option>
-                  <option value="SAR">ر.س (SAR)</option>
-                  <option value="USD">$ (USD)</option>
-                </select>
-              </div>
+          <div className="pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between gap-2 text-xs text-gray-500 flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap">
+              <select
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value as any)}
+                className="bg-gray-100 dark:bg-[#1A1515] text-xs font-semibold px-2 py-1 rounded-md border border-gray-200 dark:border-gray-800 text-gray-800 dark:text-gray-200"
+              >
+                <option value="OMR">ر.ع. (OMR)</option>
+                <option value="SAR">ر.س (SAR)</option>
+                <option value="USD">$ (USD)</option>
+              </select>
+
+              <button
+                onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 font-bold border border-gray-200 dark:border-gray-700"
+              >
+                <Globe className="w-3.5 h-3.5 text-[#7D0A0A] dark:text-[#D4AF37]" />
+                {language === 'ar' ? 'EN' : 'عربي'}
+              </button>
 
               <button
                 onClick={toggleTheme}
