@@ -56,71 +56,91 @@ export async function sql<T extends QueryResultRow = any>(
   return result.rows;
 }
 
+// Each api/*.ts file is a separate serverless function with its own cold
+// start, so concurrent first-requests (e.g. the admin dashboard firing 5
+// requests in parallel) can race on CREATE TABLE IF NOT EXISTS — Postgres's
+// existence check isn't atomic across concurrent sessions, so two sessions
+// can both decide the table is missing and both attempt to create it,
+// colliding on the implicit pg_type row with a 23505 duplicate-key error.
+// That's harmless (it just means another invocation won the race), so swallow it.
+async function safeDDL(run: () => Promise<unknown>): Promise<void> {
+  try {
+    await run();
+  } catch (err: any) {
+    if (err?.code !== '23505') throw err;
+  }
+}
+
 let schemaReady: Promise<void> | null = null;
 
 // Idempotent, runs on first request per cold start — no manual migration step needed.
 export function ensureSchema(): Promise<void> {
   if (!schemaReady) {
     schemaReady = (async () => {
-      await sql`
-        CREATE TABLE IF NOT EXISTS products (
-          id TEXT PRIMARY KEY,
-          category TEXT NOT NULL,
-          price NUMERIC(10,2) NOT NULL,
-          in_stock BOOLEAN NOT NULL DEFAULT true,
-          data JSONB NOT NULL,
-          created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-          updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-        )
-      `;
-      await sql`CREATE INDEX IF NOT EXISTS idx_products_category ON products (category)`;
+      try {
+        await safeDDL(() => sql`
+          CREATE TABLE IF NOT EXISTS products (
+            id TEXT PRIMARY KEY,
+            category TEXT NOT NULL,
+            price NUMERIC(10,2) NOT NULL,
+            in_stock BOOLEAN NOT NULL DEFAULT true,
+            data JSONB NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+          )
+        `);
+        await safeDDL(() => sql`CREATE INDEX IF NOT EXISTS idx_products_category ON products (category)`);
 
-      await sql`
-        CREATE TABLE IF NOT EXISTS orders (
-          id TEXT PRIMARY KEY,
-          order_number TEXT UNIQUE NOT NULL,
-          status TEXT NOT NULL DEFAULT 'pending',
-          total NUMERIC(10,2) NOT NULL,
-          data JSONB NOT NULL,
-          created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-          updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-        )
-      `;
-      await sql`CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders (created_at)`;
+        await safeDDL(() => sql`
+          CREATE TABLE IF NOT EXISTS orders (
+            id TEXT PRIMARY KEY,
+            order_number TEXT UNIQUE NOT NULL,
+            status TEXT NOT NULL DEFAULT 'pending',
+            total NUMERIC(10,2) NOT NULL,
+            data JSONB NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+          )
+        `);
+        await safeDDL(() => sql`CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders (created_at)`);
 
-      await sql`
-        CREATE TABLE IF NOT EXISTS coupons (
-          id TEXT PRIMARY KEY,
-          code TEXT UNIQUE NOT NULL,
-          active BOOLEAN NOT NULL DEFAULT true,
-          data JSONB NOT NULL,
-          created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-        )
-      `;
+        await safeDDL(() => sql`
+          CREATE TABLE IF NOT EXISTS coupons (
+            id TEXT PRIMARY KEY,
+            code TEXT UNIQUE NOT NULL,
+            active BOOLEAN NOT NULL DEFAULT true,
+            data JSONB NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+          )
+        `);
 
-      await sql`
-        CREATE TABLE IF NOT EXISTS customers (
-          id TEXT PRIMARY KEY,
-          data JSONB NOT NULL,
-          created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-        )
-      `;
+        await safeDDL(() => sql`
+          CREATE TABLE IF NOT EXISTS customers (
+            id TEXT PRIMARY KEY,
+            data JSONB NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+          )
+        `);
 
-      await sql`
-        CREATE TABLE IF NOT EXISTS analytics_events (
-          id BIGSERIAL PRIMARY KEY,
-          event_type TEXT NOT NULL DEFAULT 'pageview',
-          path TEXT,
-          referrer TEXT,
-          device_type TEXT,
-          country TEXT,
-          session_id TEXT,
-          meta JSONB,
-          created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-        )
-      `;
-      await sql`CREATE INDEX IF NOT EXISTS idx_analytics_created_at ON analytics_events (created_at)`;
-      await sql`CREATE INDEX IF NOT EXISTS idx_analytics_path ON analytics_events (path)`;
+        await safeDDL(() => sql`
+          CREATE TABLE IF NOT EXISTS analytics_events (
+            id BIGSERIAL PRIMARY KEY,
+            event_type TEXT NOT NULL DEFAULT 'pageview',
+            path TEXT,
+            referrer TEXT,
+            device_type TEXT,
+            country TEXT,
+            session_id TEXT,
+            meta JSONB,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+          )
+        `);
+        await safeDDL(() => sql`CREATE INDEX IF NOT EXISTS idx_analytics_created_at ON analytics_events (created_at)`);
+        await safeDDL(() => sql`CREATE INDEX IF NOT EXISTS idx_analytics_path ON analytics_events (path)`);
+      } catch (err) {
+        schemaReady = null; // allow a retry on the next request for genuine failures
+        throw err;
+      }
     })();
   }
   return schemaReady;
