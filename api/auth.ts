@@ -24,8 +24,9 @@ async function login(req: ApiRequest, res: ApiResponse) {
     res.status(401).json({ error: 'Invalid username or password' });
     return;
   }
-  setAdminCookie(res, signAdminToken());
-  res.status(200).json({ ok: true });
+  const token = signAdminToken();
+  setAdminCookie(res, token);
+  res.status(200).json({ ok: true, token });
 }
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
