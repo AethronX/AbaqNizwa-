@@ -30,7 +30,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
     searchQuery,
     setSearchQuery,
     isAdmin,
-    setIsAdmin,
   } = useStore();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -308,13 +307,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
                 )}
               </button>
             </div>
-
-            <button
-              onClick={() => setIsAdmin(!isAdmin)}
-              className="text-gray-500 hover:underline"
-            >
-              {isAdmin ? 'خروج الأدمن' : 'دخول الأدمن'}
-            </button>
           </div>
         </div>
       )}
