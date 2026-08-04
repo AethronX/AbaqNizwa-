@@ -44,52 +44,12 @@ import { OrderDetailDrawer } from '../components/OrderDetailDrawer';
 import { CustomerDetailDrawer } from '../components/CustomerDetailDrawer';
 import { downloadCsv } from '../lib/csv';
 import logo from '../assets/logo-abaq-nizwa.png';
+import { STATUS_LABELS, DEVICE_LABELS, CATEGORY_LABELS } from '../lib/constants';
+import { formatOmr, timeAgo } from '../lib/format';
 
 type Tab = 'analytics' | 'orders' | 'products' | 'coupons' | 'customers';
 type SortDir = 'asc' | 'desc';
 interface SortState { key: string; dir: SortDir; }
-
-const STATUS_LABELS: Record<string, string> = {
-  pending: 'قيد المعالجة',
-  preparing: 'تجهيز الورد',
-  arranging: 'التنسيق والتغليف',
-  shipped: 'خرج للشحن',
-  delivered: 'تم التوصيل',
-  cancelled: 'ملغي',
-};
-
-const DEVICE_LABELS: Record<string, string> = {
-  mobile: 'الجوال',
-  desktop: 'سطح المكتب',
-  tablet: 'التابلت',
-  unknown: 'غير معروف',
-};
-
-const CATEGORY_LABELS: Record<string, string> = {
-  bouquets: 'باقات الورد',
-  chocolates: 'الشوكولاتة',
-  perfumes: 'العطور',
-  wedding: 'هدايا الزواج',
-  graduation: 'هدايا التخرج',
-  baby: 'هدايا المواليد',
-  'luxury-gifts': 'هدايا فاخرة',
-};
-
-function formatOmr(n: number) {
-  return `${(n || 0).toFixed(2)} ر.ع.`;
-}
-
-function timeAgo(dateStr: string) {
-  const then = new Date(dateStr.replace(' ', 'T')).getTime();
-  if (Number.isNaN(then)) return dateStr;
-  const diffMin = Math.round((Date.now() - then) / 60000);
-  if (diffMin < 1) return 'الآن';
-  if (diffMin < 60) return `قبل ${diffMin} د`;
-  const diffH = Math.round(diffMin / 60);
-  if (diffH < 24) return `قبل ${diffH} س`;
-  const diffD = Math.round(diffH / 24);
-  return `قبل ${diffD} يوم`;
-}
 
 function sortRows<T extends Record<string, any>>(rows: T[], sort: SortState): T[] {
   return [...rows].sort((a, b) => {
@@ -463,7 +423,7 @@ export const DashboardPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#FAFAF9] dark:bg-[#0F0B0B] text-gray-900 dark:text-gray-100 text-[15px]">
       {/* Toast notifications */}
-      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[60] space-y-2 w-full max-w-sm px-4">
+      <div role="status" aria-live="polite" className="fixed top-4 left-1/2 -translate-x-1/2 z-[60] space-y-2 w-full max-w-sm px-4">
         {toasts.map((t) => (
           <div
             key={t.id}
@@ -471,7 +431,7 @@ export const DashboardPage: React.FC = () => {
           >
             <Bell className="w-4 h-4 text-[#D4AF37] shrink-0 mt-1" />
             <span className="flex-1 text-gray-800 dark:text-gray-100">{t.message}</span>
-            <button onClick={() => setToasts((prev) => prev.filter((x) => x.id !== t.id))} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-full">
+            <button onClick={() => setToasts((prev) => prev.filter((x) => x.id !== t.id))} aria-label="إغلاق الإشعار" className="text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-full">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -514,7 +474,7 @@ export const DashboardPage: React.FC = () => {
 
       <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {error && (
-          <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-300 text-sm rounded-2xl p-4 flex items-center justify-between">
+          <div role="alert" className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-300 text-sm rounded-2xl p-4 flex items-center justify-between">
             <span>{error}</span>
             <button onClick={() => loadAll()} className="font-bold underline transition-colors duration-200 hover:text-red-900 dark:hover:text-red-200">إعادة المحاولة</button>
           </div>
@@ -630,7 +590,7 @@ export const DashboardPage: React.FC = () => {
                       <div className="overflow-x-auto -mx-2">
                         <table className="w-full text-sm">
                           <thead>
-                            <tr className="text-gray-400 dark:text-gray-500 border-b border-gray-100 dark:border-gray-800">
+                            <tr className="text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800">
                               <th className="text-start py-2 px-2 font-semibold">المنتج</th>
                               <th className="text-start py-2 px-2 font-semibold">الطلبات</th>
                               <th className="text-start py-2 px-2 font-semibold">المخزون</th>
@@ -650,7 +610,7 @@ export const DashboardPage: React.FC = () => {
                                       label={tp.stock <= 0 ? 'نفذ' : tp.stock <= 3 ? 'منخفض' : 'متوفر'}
                                     />
                                   ) : (
-                                    <span className="text-gray-400">—</span>
+                                    <span className="text-gray-500">—</span>
                                   )}
                                 </td>
                               </tr>
@@ -669,7 +629,7 @@ export const DashboardPage: React.FC = () => {
                       <div className="overflow-x-auto -mx-2">
                         <table className="w-full text-sm">
                           <thead>
-                            <tr className="text-gray-400 dark:text-gray-500 border-b border-gray-100 dark:border-gray-800">
+                            <tr className="text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800">
                               <th className="text-start py-2 px-2 font-semibold">الطلب</th>
                               <th className="text-start py-2 px-2 font-semibold">العميل</th>
                               <th className="text-start py-2 px-2 font-semibold">المبلغ</th>
@@ -798,7 +758,7 @@ export const DashboardPage: React.FC = () => {
                       <thead>
                         <tr className="border-b border-gray-200 dark:border-gray-800 text-gray-500">
                           <th className="py-3 px-2 w-8">
-                            <input type="checkbox" checked={allVisibleOrdersSelected} onChange={toggleSelectAllOrders} className="rounded w-4 h-4 accent-[#7D0A0A] cursor-pointer transition-colors duration-200" />
+                            <input type="checkbox" checked={allVisibleOrdersSelected} onChange={toggleSelectAllOrders} aria-label="تحديد كل الطلبات الظاهرة" className="rounded w-4 h-4 accent-[#7D0A0A] cursor-pointer transition-colors duration-200" />
                           </th>
                           <SortableTh label="رقم الطلب" sortKey="orderNumber" sort={orderSort} onSort={(k) => setOrderSort((s) => ({ key: k, dir: s.key === k && s.dir === 'asc' ? 'desc' : 'asc' }))} />
                           <th className="py-3 px-2">العميل والمستلم</th>
@@ -817,6 +777,7 @@ export const DashboardPage: React.FC = () => {
                                 type="checkbox"
                                 checked={selectedOrderIds.has(ord.id)}
                                 onChange={() => toggleOrderSelected(ord.id)}
+                                aria-label={`تحديد الطلب ${ord.orderNumber}`}
                                 className="rounded w-4 h-4 accent-[#7D0A0A] cursor-pointer transition-colors duration-200"
                               />
                             </td>
@@ -844,7 +805,7 @@ export const DashboardPage: React.FC = () => {
                               </select>
                             </td>
                             <td className="py-4 px-2">
-                              <button onClick={() => setSelectedOrder(ord)} className="p-2 text-gray-400 hover:text-[#7D0A0A] dark:hover:text-[#D4AF37] transition-colors duration-200 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]">
+                              <button onClick={() => setSelectedOrder(ord)} aria-label={`عرض تفاصيل الطلب ${ord.orderNumber}`} className="p-2 text-gray-500 dark:text-gray-400 hover:text-[#7D0A0A] dark:hover:text-[#D4AF37] transition-colors duration-200 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]">
                                 <Eye className="w-4 h-4" />
                               </button>
                             </td>
@@ -914,7 +875,7 @@ export const DashboardPage: React.FC = () => {
                           <h4 className="font-bold text-gray-900 dark:text-gray-100 truncate">{p.nameAr}</h4>
                           <p className="text-[#7D0A0A] dark:text-[#D4AF37] font-bold">{formatOmr(p.price)}</p>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-400 dark:text-gray-500">{CATEGORY_LABELS[p.category] || p.category}</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">{CATEGORY_LABELS[p.category] || p.category}</span>
                             <StatusBadge
                               tone={stockTone(p.stockQuantity ?? 0)}
                               label={`مخزون: ${p.stockQuantity ?? 0}`}
@@ -922,10 +883,10 @@ export const DashboardPage: React.FC = () => {
                           </div>
                         </div>
                         <div className="flex flex-col gap-1 shrink-0">
-                          <button onClick={() => openEditProduct(p)} className="p-2 text-gray-400 hover:text-[#D4AF37] transition-colors duration-200 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]">
+                          <button onClick={() => openEditProduct(p)} aria-label={`تعديل ${p.nameAr}`} className="p-2 text-gray-500 dark:text-gray-400 hover:text-[#D4AF37] transition-colors duration-200 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]">
                             <Pencil className="w-4 h-4" />
                           </button>
-                          <button onClick={() => handleDeleteProduct(p.id)} className="p-2 text-gray-400 hover:text-red-500 transition-colors duration-200 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400">
+                          <button onClick={() => handleDeleteProduct(p.id)} aria-label={`حذف ${p.nameAr}`} className="p-2 text-gray-500 dark:text-gray-400 hover:text-red-500 transition-colors duration-200 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -956,7 +917,7 @@ export const DashboardPage: React.FC = () => {
                       <div key={c.id} className={`p-4 rounded-2xl border space-y-2 transition-colors duration-200 ${c.active ? 'border-[#D4AF37]/30 bg-gray-50/60 dark:bg-[#1A1515]/50' : 'border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/40 opacity-60'}`}>
                         <div className="flex items-center justify-between">
                           <span className="font-extrabold text-lg text-[#7D0A0A] dark:text-[#D4AF37]">{c.code}</span>
-                          <button onClick={() => handleDeleteCoupon(c.id)} className="text-gray-400 hover:text-red-500 transition-colors duration-200 p-1 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400">
+                          <button onClick={() => handleDeleteCoupon(c.id)} aria-label={`حذف الكود ${c.code}`} className="text-gray-500 dark:text-gray-400 hover:text-red-500 transition-colors duration-200 p-1 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -1103,12 +1064,12 @@ const selectClass = 'p-3 rounded-xl border border-gray-300 dark:border-gray-700 
 
 const SearchInput: React.FC<{ value: string; onChange: (v: string) => void; placeholder: string }> = ({ value, onChange, placeholder }) => (
   <div className="relative flex-1">
-    <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+    <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
     <input
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full p-3 pr-9 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-[#1A1515] text-gray-900 dark:text-gray-100 text-sm transition-colors duration-200 focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30"
+      className="w-full p-3 ps-9 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-[#1A1515] text-gray-900 dark:text-gray-100 text-sm transition-colors duration-200 focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30"
     />
   </div>
 );
@@ -1144,10 +1105,10 @@ const SummaryRow: React.FC<{ icon: React.ElementType; label: string; value: stri
 };
 
 const Field: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
-  <div>
-    <label className="font-semibold block mb-1 text-gray-600 dark:text-gray-300">{label}</label>
+  <label className="block space-y-1">
+    <span className="font-semibold block text-gray-600 dark:text-gray-300">{label}</span>
     {children}
-  </div>
+  </label>
 );
 
 const Modal: React.FC<{ title: string; onClose: () => void; children: React.ReactNode }> = ({ title, onClose, children }) => (

@@ -27,7 +27,7 @@ export const LoginPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-[#FDFBFB] dark:bg-[#0F0B0B] px-4 relative">
       <button
         onClick={toggleTheme}
-        className="absolute top-4 left-4 p-3 rounded-full bg-white dark:bg-[#151111] border border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300 transition-colors duration-200 hover:border-gray-300 dark:hover:border-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+        className="absolute top-4 end-4 p-3 rounded-full bg-white dark:bg-[#151111] border border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300 transition-colors duration-200 hover:border-gray-300 dark:hover:border-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
         aria-label="تبديل المظهر"
       >
         {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4 text-[#D4AF37]" />}
@@ -48,9 +48,11 @@ export const LoginPage: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 block mb-1">اسم المستخدم</label>
+            <label htmlFor="admin-username" className="text-xs font-semibold text-gray-700 dark:text-gray-300 block mb-1">اسم المستخدم</label>
             <input
+              id="admin-username"
               type="text"
+              autoComplete="username"
               required
               autoFocus
               value={username}
@@ -59,9 +61,11 @@ export const LoginPage: React.FC = () => {
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 block mb-1">كلمة المرور</label>
+            <label htmlFor="admin-password" className="text-xs font-semibold text-gray-700 dark:text-gray-300 block mb-1">كلمة المرور</label>
             <input
+              id="admin-password"
               type="password"
+              autoComplete="current-password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -70,7 +74,7 @@ export const LoginPage: React.FC = () => {
           </div>
 
           {error && (
-            <p className="text-xs text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-xl p-3">{error}</p>
+            <p role="alert" className="text-xs text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-xl p-3">{error}</p>
           )}
 
           <button
