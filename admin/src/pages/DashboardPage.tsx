@@ -479,9 +479,9 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       <header className="sticky top-0 z-40 border-b border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-[#151111]/90 backdrop-blur-md">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-[#7D0A0A] dark:text-[#D4AF37] font-bold text-base">
-            <img src={logo} alt="عبق نزوى" className="w-9 h-9 object-contain" width={36} height={36} />
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-3 text-[#7D0A0A] dark:text-[#D4AF37] font-bold text-lg">
+            <img src={logo} alt="عبق نزوى" className="w-14 h-14 object-contain" width={56} height={56} />
             <span>لوحة تحكم عبق نزوى</span>
           </div>
           <div className="flex items-center gap-3">
