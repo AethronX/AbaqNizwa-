@@ -1,17 +1,43 @@
-import { neon } from '@neondatabase/serverless';
+import { Pool, QueryResultRow } from 'pg';
 
+// Supabase's Vercel integration exposes POSTGRES_URL (pooled, via Supavisor);
+// other providers commonly use DATABASE_URL. Support both.
 const connectionString =
   process.env.DATABASE_URL ||
   process.env.POSTGRES_URL ||
+  process.env.POSTGRES_PRISMA_URL ||
   process.env.DATABASE_URL_UNPOOLED;
 
 if (!connectionString) {
   throw new Error(
-    'No database connection string found. Set DATABASE_URL (or POSTGRES_URL) in your Vercel project env vars — added automatically when you connect a Neon Postgres database from the Storage tab.'
+    'No database connection string found. Set DATABASE_URL (or POSTGRES_URL) in your Vercel project env vars — added automatically when you connect a Postgres database from the Storage tab.'
   );
 }
 
-export const sql = neon(connectionString);
+const pool = new Pool({
+  connectionString,
+  ssl: { rejectUnauthorized: false },
+  max: 1, // one connection per serverless invocation
+});
+
+function buildQuery(strings: TemplateStringsArray, values: unknown[]): string {
+  let text = strings[0];
+  for (let i = 0; i < values.length; i++) {
+    text += `$${i + 1}` + strings[i + 1];
+  }
+  return text;
+}
+
+// Mimics the neon() tagged-template driver's contract used throughout the
+// api/*.ts handlers: `await sql\`SELECT ...\`` resolves directly to the rows.
+export async function sql<T extends QueryResultRow = any>(
+  strings: TemplateStringsArray,
+  ...values: unknown[]
+): Promise<T[]> {
+  const text = buildQuery(strings, values);
+  const result = await pool.query<T>(text, values);
+  return result.rows;
+}
 
 let schemaReady: Promise<void> | null = null;
 

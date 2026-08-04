@@ -1,7 +1,7 @@
 -- Reference copy of the schema created automatically by api/_lib/db.ts
 -- (ensureSchema runs these as CREATE TABLE IF NOT EXISTS on first request).
 -- You do not need to run this manually — kept here for documentation
--- and for anyone who wants to inspect the schema via the Neon SQL editor.
+-- and for anyone who wants to inspect the schema via their provider's SQL editor.
 
 CREATE TABLE IF NOT EXISTS products (
   id TEXT PRIMARY KEY,
