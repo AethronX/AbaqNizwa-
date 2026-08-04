@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Lock, Sparkles, Sun, Moon } from 'lucide-react';
+import { Lock, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import logo from '../assets/logo-abaq-nizwa.png';
 
 export const LoginPage: React.FC = () => {
   const { login } = useAuth();
@@ -34,9 +35,13 @@ export const LoginPage: React.FC = () => {
 
       <div className="w-full max-w-sm bg-white dark:bg-[#151111] border border-gray-200 dark:border-[#D4AF37]/30 rounded-3xl p-8 space-y-6 shadow-xl dark:shadow-2xl">
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-[#7D0A0A] flex items-center justify-center">
-            <Sparkles className="w-7 h-7 text-[#D4AF37]" />
-          </div>
+          <img
+            src={logo}
+            alt="عبق نزوى"
+            className="w-20 h-20 mx-auto object-contain"
+            width={80}
+            height={80}
+          />
           <h1 className="text-xl font-extrabold text-gray-900 dark:text-gray-100">لوحة تحكم عبق نزوى</h1>
           <p className="text-xs text-gray-500 dark:text-gray-400">دخول مخصص للإدارة فقط</p>
         </div>

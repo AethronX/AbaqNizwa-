@@ -9,7 +9,6 @@ import {
   Trash2,
   Pencil,
   LogOut,
-  Sparkles,
   DatabaseZap,
   Search,
   Sun,
@@ -44,6 +43,7 @@ import { StatusBadge, orderStatusTone, stockTone } from '../components/StatusBad
 import { OrderDetailDrawer } from '../components/OrderDetailDrawer';
 import { CustomerDetailDrawer } from '../components/CustomerDetailDrawer';
 import { downloadCsv } from '../lib/csv';
+import logo from '../assets/logo-abaq-nizwa.png';
 
 type Tab = 'analytics' | 'orders' | 'products' | 'coupons' | 'customers';
 type SortDir = 'asc' | 'desc';
@@ -481,7 +481,7 @@ export const DashboardPage: React.FC = () => {
       <header className="sticky top-0 z-40 border-b border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-[#151111]/90 backdrop-blur-md">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 text-[#7D0A0A] dark:text-[#D4AF37] font-bold text-base">
-            <Sparkles className="w-5 h-5" />
+            <img src={logo} alt="عبق نزوى" className="w-9 h-9 object-contain" width={36} height={36} />
             <span>لوحة تحكم عبق نزوى</span>
           </div>
           <div className="flex items-center gap-3">
