@@ -32,7 +32,7 @@ export const ActivityFeed: React.FC<{ items: ActivityItem[] }> = ({ items }) => 
       {items.map((item) => {
         const Icon = ICONS[item.type];
         return (
-          <div key={item.id} className="flex items-center gap-3 py-2.5 border-b border-gray-100 dark:border-gray-800/60 last:border-0">
+          <div key={item.id} className="flex items-center gap-3 py-3 border-b border-gray-100 dark:border-gray-800/60 last:border-0">
             <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${COLORS[item.type]}`}>
               <Icon className="w-4 h-4" />
             </div>

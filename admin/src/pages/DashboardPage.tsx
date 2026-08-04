@@ -469,24 +469,24 @@ export const DashboardPage: React.FC = () => {
             key={t.id}
             className="bg-white dark:bg-[#151111] border border-[#D4AF37]/40 shadow-xl rounded-2xl p-4 flex items-start gap-3 text-sm animate-[fadeIn_0.3s_ease-out]"
           >
-            <Bell className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
+            <Bell className="w-4 h-4 text-[#D4AF37] shrink-0 mt-1" />
             <span className="flex-1 text-gray-800 dark:text-gray-100">{t.message}</span>
-            <button onClick={() => setToasts((prev) => prev.filter((x) => x.id !== t.id))} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
-              <X className="w-3.5 h-3.5" />
+            <button onClick={() => setToasts((prev) => prev.filter((x) => x.id !== t.id))} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-full">
+              <X className="w-4 h-4" />
             </button>
           </div>
         ))}
       </div>
 
       <header className="sticky top-0 z-40 border-b border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-[#151111]/90 backdrop-blur-md">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3 text-[#7D0A0A] dark:text-[#D4AF37] font-bold text-lg">
             <img src={logo} alt="عبق نزوى" className="w-14 h-14 object-contain" width={56} height={56} />
             <span>لوحة تحكم عبق نزوى</span>
           </div>
           <div className="flex items-center gap-3">
             {liveVisitors !== null && (
-              <div className="hidden sm:flex items-center gap-1.5 text-sm font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 px-3 py-1.5 rounded-full">
+              <div className="hidden sm:flex items-center gap-2 text-sm font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 px-3 py-2 rounded-full">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
@@ -496,14 +496,14 @@ export const DashboardPage: React.FC = () => {
             )}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300"
+              className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
               aria-label="تبديل المظهر"
             >
               {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4 text-[#D4AF37]" />}
             </button>
             <button
               onClick={logout}
-              className="flex items-center gap-1.5 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="flex items-center gap-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors duration-200 rounded-xl px-2 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
             >
               <LogOut className="w-4 h-4" />
               <span className="hidden sm:inline">تسجيل الخروج</span>
@@ -512,16 +512,16 @@ export const DashboardPage: React.FC = () => {
         </div>
       </header>
 
-      <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {error && (
           <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-300 text-sm rounded-2xl p-4 flex items-center justify-between">
             <span>{error}</span>
-            <button onClick={() => loadAll()} className="font-bold underline">إعادة المحاولة</button>
+            <button onClick={() => loadAll()} className="font-bold underline transition-colors duration-200 hover:text-red-900 dark:hover:text-red-200">إعادة المحاولة</button>
           </div>
         )}
 
         {!loading && products.length === 0 && orders.length === 0 && !error && (
-          <div className="bg-white dark:bg-[#151111] border border-[#D4AF37]/30 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="bg-white dark:bg-[#151111] border border-[#D4AF37]/30 rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
               <DatabaseZap className="w-5 h-5 text-[#D4AF37]" />
               <span>قاعدة البيانات فارغة. اضغط لتحميل كتالوج المنتجات الأولي.</span>
@@ -531,7 +531,7 @@ export const DashboardPage: React.FC = () => {
               <button
                 onClick={handleSeed}
                 disabled={seeding}
-                className="bg-[#7D0A0A] hover:bg-[#5A0707] disabled:opacity-60 text-white text-sm font-bold px-4 py-2 rounded-xl"
+                className="bg-[#7D0A0A] hover:bg-[#5A0707] disabled:opacity-60 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
               >
                 {seeding ? 'جارِ التحميل...' : 'تحميل البيانات الأولية'}
               </button>
@@ -546,7 +546,7 @@ export const DashboardPage: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all shrink-0 ${
+                className={`flex items-center gap-2 px-4 py-3 rounded-xl font-bold transition-all duration-200 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
                   activeTab === tab.id
                     ? 'bg-[#7D0A0A] text-white'
                     : 'bg-white dark:bg-[#151111] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700'
@@ -574,7 +574,7 @@ export const DashboardPage: React.FC = () => {
                         <button
                           key={d}
                           onClick={() => setRangeDays(d)}
-                          className={`px-3 py-1.5 rounded-lg font-bold transition-colors ${
+                          className={`px-3 py-2 rounded-xl font-bold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
                             rangeDays === d
                               ? 'bg-[#D4AF37] text-[#151111]'
                               : 'bg-white dark:bg-[#151111] text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-800'
@@ -640,10 +640,10 @@ export const DashboardPage: React.FC = () => {
                           <tbody className="divide-y divide-gray-50 dark:divide-gray-800/60">
                             {topProductsWithStock.map((tp: any, i: number) => (
                               <tr key={i}>
-                                <td className="py-2.5 px-2 font-medium text-gray-800 dark:text-gray-200 max-w-[160px] truncate">{tp.name_ar}</td>
-                                <td className="py-2.5 px-2 font-bold text-[#7D0A0A] dark:text-[#D4AF37]">{tp.count}</td>
-                                <td className="py-2.5 px-2 text-gray-500 dark:text-gray-400">{tp.stock ?? '—'}</td>
-                                <td className="py-2.5 px-2">
+                                <td className="py-3 px-2 font-medium text-gray-800 dark:text-gray-200 max-w-[160px] truncate">{tp.name_ar}</td>
+                                <td className="py-3 px-2 font-bold text-[#7D0A0A] dark:text-[#D4AF37]">{tp.count}</td>
+                                <td className="py-3 px-2 text-gray-500 dark:text-gray-400">{tp.stock ?? '—'}</td>
+                                <td className="py-3 px-2">
                                   {typeof tp.stock === 'number' ? (
                                     <StatusBadge
                                       tone={stockTone(tp.stock)}
@@ -678,11 +678,11 @@ export const DashboardPage: React.FC = () => {
                           </thead>
                           <tbody className="divide-y divide-gray-50 dark:divide-gray-800/60">
                             {recentOrders.map((o) => (
-                              <tr key={o.id} onClick={() => setSelectedOrder(o)} className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/30">
-                                <td className="py-2.5 px-2 font-extrabold text-[#7D0A0A] dark:text-[#D4AF37]">{o.orderNumber}</td>
-                                <td className="py-2.5 px-2 text-gray-700 dark:text-gray-300 max-w-[120px] truncate">{o.customerName}</td>
-                                <td className="py-2.5 px-2 font-bold">{formatOmr(o.total)}</td>
-                                <td className="py-2.5 px-2">
+                              <tr key={o.id} onClick={() => setSelectedOrder(o)} className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors duration-200">
+                                <td className="py-3 px-2 font-extrabold text-[#7D0A0A] dark:text-[#D4AF37]">{o.orderNumber}</td>
+                                <td className="py-3 px-2 text-gray-700 dark:text-gray-300 max-w-[120px] truncate">{o.customerName}</td>
+                                <td className="py-3 px-2 font-bold">{formatOmr(o.total)}</td>
+                                <td className="py-3 px-2">
                                   <StatusBadge tone={orderStatusTone(o.status)} label={STATUS_LABELS[o.status] || o.status} />
                                 </td>
                               </tr>
@@ -753,9 +753,9 @@ export const DashboardPage: React.FC = () => {
                 action={
                   <button
                     onClick={exportOrdersCsv}
-                    className="flex items-center gap-1.5 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-gray-800 px-3 py-1.5 rounded-lg"
+                    className="flex items-center gap-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 px-3 py-2 rounded-xl transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
                   >
-                    <Download className="w-3.5 h-3.5" /> تصدير CSV
+                    <Download className="w-4 h-4" /> تصدير CSV
                   </button>
                 }
               >
@@ -781,10 +781,10 @@ export const DashboardPage: React.FC = () => {
                         <option key={val} value={val}>{label}</option>
                       ))}
                     </select>
-                    <button onClick={handleBulkStatusUpdate} className="bg-[#7D0A0A] text-white text-sm font-bold px-4 py-1.5 rounded-lg">
+                    <button onClick={handleBulkStatusUpdate} className="bg-[#7D0A0A] hover:bg-[#5A0707] text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]">
                       تطبيق الحالة
                     </button>
-                    <button onClick={() => setSelectedOrderIds(new Set())} className="text-sm text-gray-500 dark:text-gray-400 underline">
+                    <button onClick={() => setSelectedOrderIds(new Set())} className="text-sm text-gray-500 dark:text-gray-400 underline transition-colors duration-200 hover:text-gray-800 dark:hover:text-gray-200">
                       إلغاء التحديد
                     </button>
                   </div>
@@ -798,7 +798,7 @@ export const DashboardPage: React.FC = () => {
                       <thead>
                         <tr className="border-b border-gray-200 dark:border-gray-800 text-gray-500">
                           <th className="py-3 px-2 w-8">
-                            <input type="checkbox" checked={allVisibleOrdersSelected} onChange={toggleSelectAllOrders} className="rounded" />
+                            <input type="checkbox" checked={allVisibleOrdersSelected} onChange={toggleSelectAllOrders} className="rounded w-4 h-4 accent-[#7D0A0A] cursor-pointer transition-colors duration-200" />
                           </th>
                           <SortableTh label="رقم الطلب" sortKey="orderNumber" sort={orderSort} onSort={(k) => setOrderSort((s) => ({ key: k, dir: s.key === k && s.dir === 'asc' ? 'desc' : 'asc' }))} />
                           <th className="py-3 px-2">العميل والمستلم</th>
@@ -811,40 +811,40 @@ export const DashboardPage: React.FC = () => {
                       </thead>
                       <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                         {sortedOrders.map((ord) => (
-                          <tr key={ord.id} className="hover:bg-gray-50/60 dark:hover:bg-gray-800/20 transition-colors">
-                            <td className="py-3.5 px-2">
+                          <tr key={ord.id} className="hover:bg-gray-50/60 dark:hover:bg-gray-800/20 transition-colors duration-200">
+                            <td className="py-4 px-2">
                               <input
                                 type="checkbox"
                                 checked={selectedOrderIds.has(ord.id)}
                                 onChange={() => toggleOrderSelected(ord.id)}
-                                className="rounded"
+                                className="rounded w-4 h-4 accent-[#7D0A0A] cursor-pointer transition-colors duration-200"
                               />
                             </td>
-                            <td className="py-3.5 px-2 font-extrabold text-[#7D0A0A] dark:text-[#D4AF37] cursor-pointer" onClick={() => setSelectedOrder(ord)}>
+                            <td className="py-4 px-2 font-extrabold text-[#7D0A0A] dark:text-[#D4AF37] cursor-pointer" onClick={() => setSelectedOrder(ord)}>
                               {ord.orderNumber}
                             </td>
-                            <td className="py-3.5 px-2">
+                            <td className="py-4 px-2">
                               <div className="font-bold">{ord.customerName}</div>
                               <div className="text-xs text-gray-500">إلى: {ord.recipientName} ({ord.shippingAddress?.city})</div>
                             </td>
-                            <td className="py-3.5 px-2 text-gray-500 dark:text-gray-400">{ord.date}</td>
-                            <td className="py-3.5 px-2 font-bold">{formatOmr(ord.total)}</td>
-                            <td className="py-3.5 px-2">
+                            <td className="py-4 px-2 text-gray-500 dark:text-gray-400">{ord.date}</td>
+                            <td className="py-4 px-2 font-bold">{formatOmr(ord.total)}</td>
+                            <td className="py-4 px-2">
                               <StatusBadge tone={orderStatusTone(ord.status)} label={STATUS_LABELS[ord.status] || ord.status} />
                             </td>
-                            <td className="py-3.5 px-2">
+                            <td className="py-4 px-2">
                               <select
                                 value={ord.status}
                                 onChange={(e) => handleUpdateOrderStatus(ord.id, e.target.value)}
-                                className="bg-gray-50 dark:bg-[#1A1515] text-sm p-1.5 rounded-lg border border-gray-300 dark:border-gray-700 font-bold"
+                                className="bg-gray-50 dark:bg-[#1A1515] text-sm p-2 rounded-xl border border-gray-300 dark:border-gray-700 font-bold transition-colors duration-200 focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30"
                               >
                                 {Object.entries(STATUS_LABELS).map(([val, label]) => (
                                   <option key={val} value={val}>{label}</option>
                                 ))}
                               </select>
                             </td>
-                            <td className="py-3.5 px-2">
-                              <button onClick={() => setSelectedOrder(ord)} className="p-1.5 text-gray-400 hover:text-[#7D0A0A] dark:hover:text-[#D4AF37]">
+                            <td className="py-4 px-2">
+                              <button onClick={() => setSelectedOrder(ord)} className="p-2 text-gray-400 hover:text-[#7D0A0A] dark:hover:text-[#D4AF37] transition-colors duration-200 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]">
                                 <Eye className="w-4 h-4" />
                               </button>
                             </td>
@@ -864,15 +864,15 @@ export const DashboardPage: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={exportProductsCsv}
-                      className="flex items-center gap-1.5 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-gray-800 px-3 py-1.5 rounded-lg"
+                      className="flex items-center gap-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 px-3 py-2 rounded-xl transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
                     >
-                      <Download className="w-3.5 h-3.5" /> تصدير
+                      <Download className="w-4 h-4" /> تصدير
                     </button>
                     <button
                       onClick={openAddProduct}
-                      className="bg-[#7D0A0A] text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5"
+                      className="bg-[#7D0A0A] hover:bg-[#5A0707] text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
                     >
-                      <Plus className="w-3.5 h-3.5" /> إضافة منتج
+                      <Plus className="w-4 h-4" /> إضافة منتج
                     </button>
                   </div>
                 }
@@ -908,12 +908,12 @@ export const DashboardPage: React.FC = () => {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {sortedProducts.map((p) => (
-                      <div key={p.id} className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 flex gap-4 items-center bg-gray-50/60 dark:bg-[#1A1515]/50">
+                      <div key={p.id} className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 flex gap-4 items-center bg-gray-50/60 dark:bg-[#1A1515]/50 transition-colors duration-200 hover:border-gray-300 dark:hover:border-gray-700">
                         <img src={p.images?.[0]} alt={p.nameAr} className="w-16 h-16 rounded-xl object-cover shrink-0" loading="lazy" />
                         <div className="flex-1 space-y-1 text-sm min-w-0">
                           <h4 className="font-bold text-gray-900 dark:text-gray-100 truncate">{p.nameAr}</h4>
                           <p className="text-[#7D0A0A] dark:text-[#D4AF37] font-bold">{formatOmr(p.price)}</p>
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center gap-2">
                             <span className="text-xs text-gray-400 dark:text-gray-500">{CATEGORY_LABELS[p.category] || p.category}</span>
                             <StatusBadge
                               tone={stockTone(p.stockQuantity ?? 0)}
@@ -922,10 +922,10 @@ export const DashboardPage: React.FC = () => {
                           </div>
                         </div>
                         <div className="flex flex-col gap-1 shrink-0">
-                          <button onClick={() => openEditProduct(p)} className="p-2 text-gray-400 hover:text-[#D4AF37]">
+                          <button onClick={() => openEditProduct(p)} className="p-2 text-gray-400 hover:text-[#D4AF37] transition-colors duration-200 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]">
                             <Pencil className="w-4 h-4" />
                           </button>
-                          <button onClick={() => handleDeleteProduct(p.id)} className="p-2 text-gray-400 hover:text-red-500">
+                          <button onClick={() => handleDeleteProduct(p.id)} className="p-2 text-gray-400 hover:text-red-500 transition-colors duration-200 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -942,9 +942,9 @@ export const DashboardPage: React.FC = () => {
                 action={
                   <button
                     onClick={() => setShowAddCoupon(true)}
-                    className="bg-[#7D0A0A] text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5"
+                    className="bg-[#7D0A0A] hover:bg-[#5A0707] text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
                   >
-                    <Plus className="w-3.5 h-3.5" /> إضافة كود
+                    <Plus className="w-4 h-4" /> إضافة كود
                   </button>
                 }
               >
@@ -953,17 +953,17 @@ export const DashboardPage: React.FC = () => {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {coupons.map((c) => (
-                      <div key={c.id} className={`p-4 rounded-2xl border space-y-2 ${c.active ? 'border-[#D4AF37]/30 bg-gray-50/60 dark:bg-[#1A1515]/50' : 'border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/40 opacity-60'}`}>
+                      <div key={c.id} className={`p-4 rounded-2xl border space-y-2 transition-colors duration-200 ${c.active ? 'border-[#D4AF37]/30 bg-gray-50/60 dark:bg-[#1A1515]/50' : 'border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/40 opacity-60'}`}>
                         <div className="flex items-center justify-between">
                           <span className="font-extrabold text-lg text-[#7D0A0A] dark:text-[#D4AF37]">{c.code}</span>
-                          <button onClick={() => handleDeleteCoupon(c.id)} className="text-gray-400 hover:text-red-500">
-                            <Trash2 className="w-3.5 h-3.5" />
+                          <button onClick={() => handleDeleteCoupon(c.id)} className="text-gray-400 hover:text-red-500 transition-colors duration-200 p-1 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400">
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                         <p className="text-sm text-gray-700 dark:text-gray-300 font-bold">خصم {c.discountPercent}%</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">{c.descriptionAr}</p>
                         <label className="flex items-center gap-2 pt-1 cursor-pointer">
-                          <input type="checkbox" checked={c.active} onChange={() => handleToggleCoupon(c)} className="rounded" />
+                          <input type="checkbox" checked={c.active} onChange={() => handleToggleCoupon(c)} className="rounded w-4 h-4 accent-[#7D0A0A] cursor-pointer transition-colors duration-200" />
                           <span className="text-xs font-bold text-gray-600 dark:text-gray-300">{c.active ? 'مفعّل' : 'معطّل'}</span>
                         </label>
                       </div>
@@ -979,9 +979,9 @@ export const DashboardPage: React.FC = () => {
                 action={
                   <button
                     onClick={exportCustomersCsv}
-                    className="flex items-center gap-1.5 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-gray-800 px-3 py-1.5 rounded-lg"
+                    className="flex items-center gap-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 px-3 py-2 rounded-xl transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
                   >
-                    <Download className="w-3.5 h-3.5" /> تصدير CSV
+                    <Download className="w-4 h-4" /> تصدير CSV
                   </button>
                 }
               >
@@ -1001,12 +1001,12 @@ export const DashboardPage: React.FC = () => {
                       </thead>
                       <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                         {sortedCustomers.map((c) => (
-                          <tr key={c.phone} onClick={() => setSelectedCustomer(c)} className="cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/20 transition-colors">
-                            <td className="py-3.5 px-2 font-bold">{c.name}</td>
-                            <td className="py-3.5 px-2 text-gray-500 dark:text-gray-400">{c.phone}</td>
-                            <td className="py-3.5 px-2 text-gray-500 dark:text-gray-400">{c.city}</td>
-                            <td className="py-3.5 px-2">{c.total_orders}</td>
-                            <td className="py-3.5 px-2 font-bold text-[#7D0A0A] dark:text-[#D4AF37]">{formatOmr(c.total_spent)}</td>
+                          <tr key={c.phone} onClick={() => setSelectedCustomer(c)} className="cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/20 transition-colors duration-200">
+                            <td className="py-4 px-2 font-bold">{c.name}</td>
+                            <td className="py-4 px-2 text-gray-500 dark:text-gray-400">{c.phone}</td>
+                            <td className="py-4 px-2 text-gray-500 dark:text-gray-400">{c.city}</td>
+                            <td className="py-4 px-2">{c.total_orders}</td>
+                            <td className="py-4 px-2 font-bold text-[#7D0A0A] dark:text-[#D4AF37]">{formatOmr(c.total_spent)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -1098,23 +1098,23 @@ export const DashboardPage: React.FC = () => {
   );
 };
 
-const inputClass = 'w-full p-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-[#1A1515] text-gray-900 dark:text-gray-100 text-sm';
-const selectClass = 'p-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-[#1A1515] text-gray-900 dark:text-gray-100 text-sm font-bold';
+const inputClass = 'w-full p-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-[#1A1515] text-gray-900 dark:text-gray-100 text-sm transition-colors duration-200 focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30';
+const selectClass = 'p-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-[#1A1515] text-gray-900 dark:text-gray-100 text-sm font-bold transition-colors duration-200 focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30';
 
 const SearchInput: React.FC<{ value: string; onChange: (v: string) => void; placeholder: string }> = ({ value, onChange, placeholder }) => (
   <div className="relative flex-1">
-    <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+    <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
     <input
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full p-2.5 pr-9 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-[#1A1515] text-gray-900 dark:text-gray-100 text-sm"
+      className="w-full p-3 pr-9 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-[#1A1515] text-gray-900 dark:text-gray-100 text-sm transition-colors duration-200 focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30"
     />
   </div>
 );
 
 const SortableTh: React.FC<{ label: string; sortKey: string; sort: SortState; onSort: (key: string) => void }> = ({ label, sortKey, sort, onSort }) => (
-  <th className="py-3 px-2 cursor-pointer select-none hover:text-gray-700 dark:hover:text-gray-300" onClick={() => onSort(sortKey)}>
+  <th className="py-3 px-2 cursor-pointer select-none hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200" onClick={() => onSort(sortKey)}>
     <span className="inline-flex items-center gap-1">
       {label}
       {sort.key === sortKey ? (
@@ -1135,7 +1135,7 @@ const SummaryRow: React.FC<{ icon: React.ElementType; label: string; value: stri
   return (
     <div className="flex items-center justify-between text-sm">
       <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-        <Icon className="w-3.5 h-3.5" />
+        <Icon className="w-4 h-4" />
         <span>{label}</span>
       </div>
       <span className={`font-extrabold ${toneClass}`}>{value}</span>
@@ -1151,8 +1151,8 @@ const Field: React.FC<{ label: string; children: React.ReactNode }> = ({ label, 
 );
 
 const Modal: React.FC<{ title: string; onClose: () => void; children: React.ReactNode }> = ({ title, onClose, children }) => (
-  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
-    <div className="bg-white dark:bg-[#151111] p-6 rounded-3xl max-w-md w-full space-y-4 border border-[#7D0A0A]/20 dark:border-[#7D0A0A]/40 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]" onClick={onClose}>
+    <div className="bg-white dark:bg-[#151111] p-6 rounded-3xl max-w-md w-full space-y-4 border border-[#7D0A0A]/20 dark:border-[#7D0A0A]/40 max-h-[90vh] overflow-y-auto animate-[modalIn_0.2s_ease-out]" onClick={(e) => e.stopPropagation()}>
       <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">{title}</h3>
       {children}
     </div>
@@ -1161,7 +1161,7 @@ const Modal: React.FC<{ title: string; onClose: () => void; children: React.Reac
 
 const ModalActions: React.FC<{ onClose: () => void; submitLabel: string }> = ({ onClose, submitLabel }) => (
   <div className="flex justify-end gap-2 pt-2">
-    <button type="button" onClick={onClose} className="px-4 py-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800">إلغاء</button>
-    <button type="submit" className="bg-[#7D0A0A] text-white px-5 py-2 rounded-xl font-bold">{submitLabel}</button>
+    <button type="button" onClick={onClose} className="px-4 py-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]">إلغاء</button>
+    <button type="submit" className="bg-[#7D0A0A] hover:bg-[#5A0707] text-white px-6 py-2 rounded-xl font-bold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]">{submitLabel}</button>
   </div>
 );

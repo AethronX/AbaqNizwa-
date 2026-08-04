@@ -25,19 +25,19 @@ export const CustomerDetailDrawer: React.FC<{ customer: any; orders: any[]; onCl
   const customerOrders = orders.filter((o) => o.customerPhone === customer.phone);
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-full max-w-lg h-full bg-white dark:bg-[#151111] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
-        <div className="sticky top-0 bg-white dark:bg-[#151111] border-b border-gray-100 dark:border-gray-800 p-5 flex items-center justify-between z-10">
+    <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]" onClick={onClose}>
+      <div className="w-full max-w-lg h-full bg-white dark:bg-[#151111] overflow-y-auto shadow-2xl animate-[slideIn_0.25s_ease-out]" onClick={(e) => e.stopPropagation()}>
+        <div className="sticky top-0 bg-white dark:bg-[#151111] border-b border-gray-100 dark:border-gray-800 p-6 flex items-center justify-between z-10">
           <div>
             <h3 className="font-extrabold text-base text-gray-900 dark:text-gray-100">{customer.name}</h3>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 flex items-center gap-1"><Phone className="w-3 h-3" /> {customer.phone}</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 flex items-center gap-1"><Phone className="w-3 h-3" /> {customer.phone}</p>
           </div>
-          <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400">
+          <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]">
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="p-5 space-y-6 text-sm">
+        <div className="p-6 space-y-6 text-sm">
           <div className="grid grid-cols-3 gap-3">
             <SummaryTile icon={ShoppingBag} label="الطلبات" value={String(customer.total_orders)} />
             <SummaryTile icon={Wallet} label="إجمالي الإنفاق" value={formatOmr(customer.total_spent)} />
@@ -45,8 +45,8 @@ export const CustomerDetailDrawer: React.FC<{ customer: any; orders: any[]; onCl
           </div>
 
           {customer.first_order_at && (
-            <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5" /> أول طلب: {new Date(customer.first_order_at).toLocaleDateString('ar')}
+            <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-2">
+              <Calendar className="w-4 h-4" /> أول طلب: {new Date(customer.first_order_at).toLocaleDateString('ar')}
             </p>
           )}
 
@@ -60,11 +60,11 @@ export const CustomerDetailDrawer: React.FC<{ customer: any; orders: any[]; onCl
                   <button
                     key={o.id}
                     onClick={() => onSelectOrder(o)}
-                    className="w-full flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-[#1A1515] hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-start"
+                    className="w-full flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-[#1A1515] hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
                   >
                     <div>
                       <p className="font-extrabold text-xs text-[#7D0A0A] dark:text-[#D4AF37]">{o.orderNumber}</p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{o.date}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{o.date}</p>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-xs font-bold text-gray-700 dark:text-gray-300">{formatOmr(o.total)}</span>

@@ -48,25 +48,25 @@ export const OrderDetailDrawer: React.FC<{ order: any; onClose: () => void; onSa
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]" onClick={onClose}>
       <div
-        className="w-full max-w-lg h-full bg-white dark:bg-[#151111] overflow-y-auto shadow-2xl"
+        className="w-full max-w-lg h-full bg-white dark:bg-[#151111] overflow-y-auto shadow-2xl animate-[slideIn_0.25s_ease-out]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="sticky top-0 bg-white dark:bg-[#151111] border-b border-gray-100 dark:border-gray-800 p-5 flex items-center justify-between z-10">
+        <div className="sticky top-0 bg-white dark:bg-[#151111] border-b border-gray-100 dark:border-gray-800 p-6 flex items-center justify-between z-10">
           <div>
             <h3 className="font-extrabold text-base text-[#7D0A0A] dark:text-[#D4AF37]">{order.orderNumber}</h3>
-            <p className="text-sm text-gray-400 dark:text-gray-500 mt-0.5">{order.date}</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">{order.date}</p>
           </div>
           <div className="flex items-center gap-3">
             <StatusBadge tone={orderStatusTone(order.status)} label={STATUS_LABELS[order.status] || order.status} />
-            <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400">
+            <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]">
               <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        <div className="p-5 space-y-6 text-sm">
+        <div className="p-6 space-y-6 text-sm">
           {/* Tracking timeline — real data already collected per order, never surfaced before */}
           <section>
             <h4 className="text-sm font-bold text-gray-400 dark:text-gray-500 mb-3">مراحل تنفيذ الطلب</h4>
@@ -108,15 +108,15 @@ export const OrderDetailDrawer: React.FC<{ order: any; onClose: () => void; onSa
 
           {/* Shipping */}
           <section>
-            <h4 className="text-sm font-bold text-gray-400 dark:text-gray-500 mb-2 flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> عنوان التوصيل</h4>
+            <h4 className="text-sm font-bold text-gray-400 dark:text-gray-500 mb-2 flex items-center gap-1"><MapPin className="w-4 h-4" /> عنوان التوصيل</h4>
             <p className="text-sm text-gray-700 dark:text-gray-300">
               {order.shippingAddress?.city} — {order.shippingAddress?.area} — {order.shippingAddress?.street}
               {order.shippingAddress?.building ? ` — ${order.shippingAddress.building}` : ''}
             </p>
             {order.shippingAddress?.notes && <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">ملاحظات: {order.shippingAddress.notes}</p>}
             <div className="flex items-center gap-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
-              <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> {order.deliveryDate}</span>
-              <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {order.deliveryTime}</span>
+              <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {order.deliveryDate}</span>
+              <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {order.deliveryTime}</span>
             </div>
           </section>
 
@@ -125,9 +125,9 @@ export const OrderDetailDrawer: React.FC<{ order: any; onClose: () => void; onSa
             <h4 className="text-sm font-bold text-gray-400 dark:text-gray-500 mb-2">المنتجات ({order.items?.length || 0})</h4>
             <div className="space-y-2">
               {(order.items || []).map((item: any, i: number) => (
-                <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl bg-gray-50 dark:bg-[#1A1515]">
+                <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-[#1A1515]">
                   {item.product?.images?.[0] && (
-                    <img src={item.product.images[0]} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                    <img src={item.product.images[0]} alt="" className="w-10 h-10 rounded-xl object-cover shrink-0" />
                   )}
                   <div className="flex-1 min-w-0 text-sm">
                     <p className="font-bold text-gray-800 dark:text-gray-200 truncate">{item.product?.nameAr}</p>
@@ -140,7 +140,7 @@ export const OrderDetailDrawer: React.FC<{ order: any; onClose: () => void; onSa
           </section>
 
           {/* Totals */}
-          <section className="space-y-1.5 text-sm border-t border-gray-100 dark:border-gray-800 pt-4">
+          <section className="space-y-2 text-sm border-t border-gray-100 dark:border-gray-800 pt-4">
             <div className="flex justify-between text-gray-500 dark:text-gray-400">
               <span>المجموع الفرعي</span><span>{formatOmr(order.subtotal)}</span>
             </div>
@@ -153,10 +153,10 @@ export const OrderDetailDrawer: React.FC<{ order: any; onClose: () => void; onSa
             <div className="flex justify-between text-gray-500 dark:text-gray-400">
               <span>التوصيل</span><span>{formatOmr(order.deliveryFee)}</span>
             </div>
-            <div className="flex justify-between font-extrabold text-sm text-gray-900 dark:text-gray-100 pt-1.5 border-t border-gray-100 dark:border-gray-800">
+            <div className="flex justify-between font-extrabold text-sm text-gray-900 dark:text-gray-100 pt-2 border-t border-gray-100 dark:border-gray-800">
               <span>الإجمالي</span><span>{formatOmr(order.total)}</span>
             </div>
-            <div className="flex items-center gap-1.5 text-gray-400 dark:text-gray-500 pt-1">
+            <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 pt-1">
               <CreditCard className="w-3 h-3" />
               <span>{PAYMENT_LABELS[order.paymentMethod] || order.paymentMethod}</span>
             </div>
@@ -170,14 +170,14 @@ export const OrderDetailDrawer: React.FC<{ order: any; onClose: () => void; onSa
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               placeholder="أضف ملاحظة عن هذا الطلب..."
-              className="w-full p-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-[#1A1515] text-gray-900 dark:text-gray-100 text-sm resize-none"
+              className="w-full p-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-[#1A1515] text-gray-900 dark:text-gray-100 text-sm resize-none transition-colors duration-200 focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30"
             />
             <button
               onClick={handleSaveNotes}
               disabled={saving}
-              className="mt-2 flex items-center gap-1.5 bg-[#7D0A0A] hover:bg-[#5A0707] disabled:opacity-60 text-white text-sm font-bold px-4 py-2 rounded-xl"
+              className="mt-2 flex items-center gap-2 bg-[#7D0A0A] hover:bg-[#5A0707] disabled:opacity-60 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
             >
-              <Save className="w-3.5 h-3.5" />
+              <Save className="w-4 h-4" />
               {saving ? 'جارِ الحفظ...' : saved ? 'تم الحفظ ✓' : 'حفظ الملاحظة'}
             </button>
           </section>
