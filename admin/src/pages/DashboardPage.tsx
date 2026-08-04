@@ -255,7 +255,9 @@ export const DashboardPage: React.FC = () => {
     loadAll();
   };
 
-  const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+  const totalRevenue = orders
+    .filter((o) => o.status !== 'cancelled')
+    .reduce((sum, o) => sum + (o.total || 0), 0);
   const lowStockCount = products.filter((p) => (p.stockQuantity ?? 0) <= 3).length;
 
   const filteredOrders = useMemo(() => {
