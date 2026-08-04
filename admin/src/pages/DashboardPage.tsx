@@ -16,12 +16,27 @@ import {
   Moon,
   Bell,
   X,
+  DollarSign,
+  TrendingUp,
+  Eye,
+  UserCheck,
+  Percent,
+  Repeat,
+  Boxes,
+  UserPlus,
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { SimpleLineChart } from '../components/SimpleLineChart';
-import { SimpleBarList } from '../components/SimpleBarList';
+import { DashboardCard } from '../components/DashboardCard';
+import { SectionHeader } from '../components/SectionHeader';
+import { StatCard } from '../components/StatCard';
+import { ProgressBarList } from '../components/ProgressBar';
+import { ChartContainer } from '../components/ChartContainer';
+import { EmptyState } from '../components/EmptyState';
+import { DashboardSkeleton } from '../components/Skeleton';
+import { ActivityFeed, ActivityItem } from '../components/ActivityCard';
+import { StatusBadge, orderStatusTone, stockTone } from '../components/StatusBadge';
 
 type Tab = 'analytics' | 'orders' | 'products' | 'coupons' | 'customers';
 
@@ -32,6 +47,13 @@ const STATUS_LABELS: Record<string, string> = {
   shipped: 'خرج للشحن',
   delivered: 'تم التوصيل',
   cancelled: 'ملغي',
+};
+
+const DEVICE_LABELS: Record<string, string> = {
+  mobile: 'الجوال',
+  desktop: 'سطح المكتب',
+  tablet: 'التابلت',
+  unknown: 'غير معروف',
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -46,6 +68,18 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 function formatOmr(n: number) {
   return `${(n || 0).toFixed(2)} ر.ع.`;
+}
+
+function timeAgo(dateStr: string) {
+  const then = new Date(dateStr.replace(' ', 'T')).getTime();
+  if (Number.isNaN(then)) return dateStr;
+  const diffMin = Math.round((Date.now() - then) / 60000);
+  if (diffMin < 1) return 'الآن';
+  if (diffMin < 60) return `قبل ${diffMin} د`;
+  const diffH = Math.round(diffMin / 60);
+  if (diffH < 24) return `قبل ${diffH} س`;
+  const diffD = Math.round(diffH / 24);
+  return `قبل ${diffD} يوم`;
 }
 
 const emptyProductForm = {
@@ -255,10 +289,49 @@ export const DashboardPage: React.FC = () => {
     loadAll();
   };
 
-  const totalRevenue = orders
-    .filter((o) => o.status !== 'cancelled')
-    .reduce((sum, o) => sum + (o.total || 0), 0);
-  const lowStockCount = products.filter((p) => (p.stockQuantity ?? 0) <= 3).length;
+  // All-time revenue (used only as a fallback label); the KPI cards use the
+  // range-scoped, cancelled-excluded figures the backend already computes.
+  const lowStockCount = products.filter((p) => (p.stockQuantity ?? 0) > 0 && (p.stockQuantity ?? 0) <= 3).length;
+  const outOfStockCount = products.filter((p) => (p.stockQuantity ?? 0) <= 0).length;
+  const availableCount = products.length - lowStockCount - outOfStockCount;
+
+  const orderStats = analytics?.orderStats ?? { total_orders: 0, total_revenue: 0, avg_order_value: 0 };
+  const totalVisits = analytics?.totalVisits ?? { total: 0, unique_sessions: 0 };
+  const conversionRate = totalVisits.total > 0 ? (orderStats.total_orders / totalVisits.total) * 100 : 0;
+  const returningCustomers = customers.filter((c) => (c.total_orders ?? 0) > 1).length;
+  const returningRate = customers.length > 0 ? (returningCustomers / customers.length) * 100 : 0;
+
+  const rangeStartMs = Date.now() - rangeDays * 24 * 60 * 60 * 1000;
+  const newCustomersInRange = customers.filter((c) => {
+    const t = new Date(c.first_order_at).getTime();
+    return Number.isFinite(t) && t >= rangeStartMs;
+  }).length;
+
+  // Activity feed: derived entirely from the already-loaded orders list —
+  // a customer's first (by date) order in this list is "new customer",
+  // otherwise classified by current status. No invented data.
+  const activityItems: ActivityItem[] = useMemo(() => {
+    const seenPhones = new Set<string>();
+    const sortedAsc = [...orders].sort((a, b) => a.date.localeCompare(b.date));
+    const classified = sortedAsc.map((o) => {
+      const isFirstForCustomer = o.customerPhone && !seenPhones.has(o.customerPhone);
+      if (o.customerPhone) seenPhones.add(o.customerPhone);
+      let type: ActivityItem['type'] = 'new_order';
+      let title = `طلب جديد ${o.orderNumber} من ${o.customerName} — ${formatOmr(o.total)}`;
+      if (isFirstForCustomer) {
+        type = 'new_customer';
+        title = `عميل جديد: ${o.customerName} (أول طلب ${o.orderNumber})`;
+      } else if (o.status === 'cancelled') {
+        type = 'cancelled';
+        title = `طلب ملغي ${o.orderNumber}`;
+      } else if (o.status === 'delivered') {
+        type = 'delivered';
+        title = `تم توصيل الطلب ${o.orderNumber}`;
+      }
+      return { id: o.id, type, title, time: timeAgo(o.date) };
+    });
+    return classified.reverse().slice(0, 8);
+  }, [orders]);
 
   const filteredOrders = useMemo(() => {
     const q = orderSearch.trim().toLowerCase();
@@ -288,8 +361,17 @@ export const DashboardPage: React.FC = () => {
     });
   }, [products, productSearch, productCategoryFilter]);
 
+  const topProductsWithStock = useMemo(() => {
+    return (analytics?.topProducts ?? []).map((tp: any) => {
+      const match = products.find((p) => p.nameAr === tp.name_ar);
+      return { ...tp, stock: match?.stockQuantity, price: match?.price };
+    });
+  }, [analytics, products]);
+
+  const recentOrders = orders.slice(0, 6);
+
   const tabs: { id: Tab; label: string; icon: any }[] = [
-    { id: 'analytics', label: 'التحليلات والمؤشرات', icon: BarChart3 },
+    { id: 'analytics', label: 'نظرة عامة', icon: BarChart3 },
     { id: 'orders', label: `الطلبات (${orders.length})`, icon: ShoppingBag },
     { id: 'products', label: `المنتجات (${products.length})`, icon: Package },
     { id: 'coupons', label: `أكواد الخصم (${coupons.length})`, icon: Tag },
@@ -297,7 +379,7 @@ export const DashboardPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FDFBFB] dark:bg-[#0F0B0B] text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen bg-[#FAFAF9] dark:bg-[#0F0B0B] text-gray-900 dark:text-gray-100">
       {/* Toast notifications */}
       <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[60] space-y-2 w-full max-w-sm px-4">
         {toasts.map((t) => (
@@ -314,15 +396,15 @@ export const DashboardPage: React.FC = () => {
         ))}
       </div>
 
-      <header className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#151111]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <header className="sticky top-0 z-40 border-b border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-[#151111]/90 backdrop-blur-md">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 text-[#7D0A0A] dark:text-[#D4AF37] font-bold text-sm">
             <Sparkles className="w-5 h-5" />
             <span>لوحة تحكم عبق نزوى</span>
           </div>
           <div className="flex items-center gap-3">
             {liveVisitors !== null && (
-              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 px-3 py-1.5 rounded-full">
+              <div className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 px-3 py-1.5 rounded-full">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
@@ -342,13 +424,13 @@ export const DashboardPage: React.FC = () => {
               className="flex items-center gap-1.5 text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               <LogOut className="w-4 h-4" />
-              تسجيل الخروج
+              <span className="hidden sm:inline">تسجيل الخروج</span>
             </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {error && (
           <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-300 text-sm rounded-2xl p-4 flex items-center justify-between">
             <span>{error}</span>
@@ -375,12 +457,6 @@ export const DashboardPage: React.FC = () => {
           </div>
         )}
 
-        {!loading && lowStockCount > 0 && (
-          <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-300 text-sm rounded-2xl p-4">
-            تنبيه: {lowStockCount} منتج بمخزون منخفض (3 قطع أو أقل) — راجع تبويب المنتجات.
-          </div>
-        )}
-
         <div className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-gray-200 dark:border-gray-800 text-xs">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -391,7 +467,7 @@ export const DashboardPage: React.FC = () => {
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-all shrink-0 ${
                   activeTab === tab.id
                     ? 'bg-[#7D0A0A] text-white'
-                    : 'bg-white dark:bg-[#151111] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-800'
+                    : 'bg-white dark:bg-[#151111] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700'
                 }`}
               >
                 <Icon className="w-4 h-4 text-[#D4AF37]" />
@@ -402,75 +478,195 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-24">
-            <div className="w-10 h-10 border-4 border-[#D4AF37]/20 border-t-[#D4AF37] rounded-full animate-spin" />
-          </div>
+          <DashboardSkeleton />
         ) : (
           <>
             {activeTab === 'analytics' && (
-              <div className="space-y-6">
-                <div className="flex items-center justify-end gap-2 text-xs">
-                  {[7, 30, 90].map((d) => (
-                    <button
-                      key={d}
-                      onClick={() => setRangeDays(d)}
-                      className={`px-3 py-1.5 rounded-lg font-bold ${
-                        rangeDays === d
-                          ? 'bg-[#D4AF37] text-[#151111]'
-                          : 'bg-white dark:bg-[#151111] text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-800'
-                      }`}
-                    >
-                      {d} يوم
-                    </button>
-                  ))}
-                </div>
+              <div className="space-y-8">
+                <SectionHeader
+                  title="نظرة عامة على الأداء"
+                  description="كل الأرقام محدّثة تلقائياً من بيانات المتجر الحقيقية"
+                  action={
+                    <div className="flex items-center gap-2 text-xs">
+                      {[7, 30, 90].map((d) => (
+                        <button
+                          key={d}
+                          onClick={() => setRangeDays(d)}
+                          className={`px-3 py-1.5 rounded-lg font-bold transition-colors ${
+                            rangeDays === d
+                              ? 'bg-[#D4AF37] text-[#151111]'
+                              : 'bg-white dark:bg-[#151111] text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-800'
+                          }`}
+                        >
+                          {d} يوم
+                        </button>
+                      ))}
+                    </div>
+                  }
+                />
 
+                {/* KPI Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <StatCard label="إجمالي الإيرادات" value={formatOmr(totalRevenue)} />
-                  <StatCard label="عدد الطلبات" value={String(orders.length)} />
-                  <StatCard label="الزيارات" value={String(analytics?.totalVisits?.total ?? 0)} />
-                  <StatCard label="زوّار فريدون" value={String(analytics?.totalVisits?.unique_sessions ?? 0)} />
+                  <StatCard icon={DollarSign} label="إجمالي الإيرادات" value={formatOmr(orderStats.total_revenue)} />
+                  <StatCard icon={ShoppingBag} label="عدد الطلبات" value={String(orderStats.total_orders)} />
+                  <StatCard icon={Eye} label="الزيارات" value={String(totalVisits.total)} />
+                  <StatCard icon={UserCheck} label="زوّار فريدون" value={String(totalVisits.unique_sessions)} />
                 </div>
 
+                {/* Charts */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <Panel title="الزيارات عبر الوقت">
-                    <SimpleLineChart
-                      data={(analytics?.visitsByDay ?? []).map((r: any) => ({ label: r.day, value: r.count }))}
-                      color="#D4AF37"
-                    />
-                  </Panel>
-                  <Panel title="الإيرادات عبر الوقت">
-                    <SimpleLineChart
+                  <DashboardCard title="الإيرادات عبر الوقت" subtitle="ر.ع. — الطلبات الملغية غير محتسبة">
+                    <ChartContainer
                       data={(analytics?.ordersByDay ?? []).map((r: any) => ({ label: r.day, value: r.revenue }))}
                       color="#7D0A0A"
                     />
-                  </Panel>
-                  <Panel title="أكثر الصفحات زيارة">
-                    <SimpleBarList
+                  </DashboardCard>
+                  <DashboardCard title="الزيارات عبر الوقت">
+                    <ChartContainer
+                      data={(analytics?.visitsByDay ?? []).map((r: any) => ({ label: r.day, value: r.count }))}
+                      color="#D4AF37"
+                    />
+                  </DashboardCard>
+                </div>
+
+                {/* Business Insights */}
+                <div>
+                  <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 mb-3">مؤشرات الأداء التجاري</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <StatCard icon={TrendingUp} label="متوسط قيمة الطلب" value={formatOmr(orderStats.avg_order_value)} />
+                    <StatCard icon={Percent} label="معدل التحويل" value={`${conversionRate.toFixed(1)}%`} />
+                    <StatCard icon={Repeat} label="عملاء متكررون" value={customers.length > 0 ? `${returningRate.toFixed(0)}%` : '—'} />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {/* Top Products table */}
+                  <DashboardCard title="المنتجات الأكثر طلباً">
+                    {topProductsWithStock.length === 0 ? (
+                      <EmptyState icon={Package} title="لا توجد بيانات منتجات لهذه الفترة" />
+                    ) : (
+                      <div className="overflow-x-auto -mx-2">
+                        <table className="w-full text-xs">
+                          <thead>
+                            <tr className="text-gray-400 dark:text-gray-500 border-b border-gray-100 dark:border-gray-800">
+                              <th className="text-start py-2 px-2 font-semibold">المنتج</th>
+                              <th className="text-start py-2 px-2 font-semibold">الطلبات</th>
+                              <th className="text-start py-2 px-2 font-semibold">المخزون</th>
+                              <th className="text-start py-2 px-2 font-semibold">الحالة</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-50 dark:divide-gray-800/60">
+                            {topProductsWithStock.map((tp: any, i: number) => (
+                              <tr key={i}>
+                                <td className="py-2.5 px-2 font-medium text-gray-800 dark:text-gray-200 max-w-[160px] truncate">{tp.name_ar}</td>
+                                <td className="py-2.5 px-2 font-bold text-[#7D0A0A] dark:text-[#D4AF37]">{tp.count}</td>
+                                <td className="py-2.5 px-2 text-gray-500 dark:text-gray-400">{tp.stock ?? '—'}</td>
+                                <td className="py-2.5 px-2">
+                                  {typeof tp.stock === 'number' ? (
+                                    <StatusBadge
+                                      tone={stockTone(tp.stock)}
+                                      label={tp.stock <= 0 ? 'نفذ' : tp.stock <= 3 ? 'منخفض' : 'متوفر'}
+                                    />
+                                  ) : (
+                                    <span className="text-gray-400">—</span>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </DashboardCard>
+
+                  {/* Recent Orders widget */}
+                  <DashboardCard title="أحدث الطلبات">
+                    {recentOrders.length === 0 ? (
+                      <EmptyState icon={ShoppingBag} title="لا توجد طلبات بعد" description="ستظهر هنا الطلبات فور وصولها" />
+                    ) : (
+                      <div className="overflow-x-auto -mx-2">
+                        <table className="w-full text-xs">
+                          <thead>
+                            <tr className="text-gray-400 dark:text-gray-500 border-b border-gray-100 dark:border-gray-800">
+                              <th className="text-start py-2 px-2 font-semibold">الطلب</th>
+                              <th className="text-start py-2 px-2 font-semibold">العميل</th>
+                              <th className="text-start py-2 px-2 font-semibold">المبلغ</th>
+                              <th className="text-start py-2 px-2 font-semibold">الحالة</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-50 dark:divide-gray-800/60">
+                            {recentOrders.map((o) => (
+                              <tr key={o.id}>
+                                <td className="py-2.5 px-2 font-extrabold text-[#7D0A0A] dark:text-[#D4AF37]">{o.orderNumber}</td>
+                                <td className="py-2.5 px-2 text-gray-700 dark:text-gray-300 max-w-[120px] truncate">{o.customerName}</td>
+                                <td className="py-2.5 px-2 font-bold">{formatOmr(o.total)}</td>
+                                <td className="py-2.5 px-2">
+                                  <StatusBadge tone={orderStatusTone(o.status)} label={STATUS_LABELS[o.status] || o.status} />
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </DashboardCard>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  {/* Customers summary */}
+                  <DashboardCard title="ملخص العملاء">
+                    {customers.length === 0 ? (
+                      <EmptyState icon={Users} title="لا يوجد عملاء بعد" />
+                    ) : (
+                      <div className="space-y-3">
+                        <SummaryRow icon={Users} label="إجمالي العملاء" value={String(customers.length)} />
+                        <SummaryRow icon={UserPlus} label={`عملاء جدد (${rangeDays} يوم)`} value={String(newCustomersInRange)} />
+                        <SummaryRow icon={Repeat} label="عملاء متكررون" value={String(returningCustomers)} />
+                      </div>
+                    )}
+                  </DashboardCard>
+
+                  {/* Inventory overview */}
+                  <DashboardCard title="نظرة على المخزون">
+                    {products.length === 0 ? (
+                      <EmptyState icon={Boxes} title="لا توجد بيانات مخزون" />
+                    ) : (
+                      <div className="space-y-3">
+                        <SummaryRow icon={Boxes} label="منتجات متوفرة" value={String(availableCount)} tone="success" />
+                        <SummaryRow icon={Boxes} label="مخزون منخفض" value={String(lowStockCount)} tone="warning" />
+                        <SummaryRow icon={Boxes} label="نفذ من المخزون" value={String(outOfStockCount)} tone="danger" />
+                      </div>
+                    )}
+                  </DashboardCard>
+
+                  {/* Devices */}
+                  <DashboardCard title="الأجهزة">
+                    <ProgressBarList
+                      data={(analytics?.deviceBreakdown ?? []).map((r: any) => ({ label: DEVICE_LABELS[r.device_type] || r.device_type, value: r.count }))}
+                      color="#7D0A0A"
+                    />
+                  </DashboardCard>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {/* Traffic */}
+                  <DashboardCard title="أكثر الصفحات زيارة">
+                    <ProgressBarList
                       data={(analytics?.topPaths ?? []).map((r: any) => ({ label: r.path, value: r.count }))}
+                      color="#D4AF37"
                     />
-                  </Panel>
-                  <Panel title="المنتجات الأكثر طلباً">
-                    <SimpleBarList
-                      data={(analytics?.topProducts ?? []).map((r: any) => ({ label: r.name_ar, value: r.count }))}
-                    />
-                  </Panel>
-                  <Panel title="الأجهزة">
-                    <SimpleBarList
-                      data={(analytics?.deviceBreakdown ?? []).map((r: any) => ({ label: r.device_type, value: r.count }))}
-                    />
-                  </Panel>
-                  <Panel title="المدن الأكثر طلباً">
-                    <SimpleBarList
-                      data={(analytics?.topCities ?? []).map((r: any) => ({ label: r.city, value: r.count }))}
-                    />
-                  </Panel>
+                  </DashboardCard>
+
+                  {/* Activity Feed */}
+                  <DashboardCard title="أحدث الأنشطة">
+                    <ActivityFeed items={activityItems} />
+                  </DashboardCard>
                 </div>
               </div>
             )}
 
             {activeTab === 'orders' && (
-              <Panel title="قائمة الطلبات وتحديث الحالة">
+              <DashboardCard title="قائمة الطلبات وتحديث الحالة">
                 <div className="flex flex-col sm:flex-row gap-3">
                   <SearchInput value={orderSearch} onChange={setOrderSearch} placeholder="ابحث برقم الطلب أو اسم العميل أو الهاتف..." />
                   <select
@@ -484,57 +680,56 @@ export const DashboardPage: React.FC = () => {
                     ))}
                   </select>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-start text-xs">
-                    <thead>
-                      <tr className="border-b border-gray-200 dark:border-gray-800 text-gray-500">
-                        <th className="py-3 px-2">رقم الطلب</th>
-                        <th className="py-3 px-2">العميل والمستلم</th>
-                        <th className="py-3 px-2">التاريخ</th>
-                        <th className="py-3 px-2">المبلغ</th>
-                        <th className="py-3 px-2">الحالة</th>
-                        <th className="py-3 px-2">تحديث</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                      {filteredOrders.map((ord) => (
-                        <tr key={ord.id}>
-                          <td className="py-3.5 px-2 font-extrabold text-[#7D0A0A] dark:text-[#D4AF37]">{ord.orderNumber}</td>
-                          <td className="py-3.5 px-2">
-                            <div className="font-bold">{ord.customerName}</div>
-                            <div className="text-[10px] text-gray-500">إلى: {ord.recipientName} ({ord.shippingAddress?.city})</div>
-                          </td>
-                          <td className="py-3.5 px-2 text-gray-500 dark:text-gray-400">{ord.date}</td>
-                          <td className="py-3.5 px-2 font-bold">{formatOmr(ord.total)}</td>
-                          <td className="py-3.5 px-2">
-                            <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-[#7D0A0A] text-white">
-                              {STATUS_LABELS[ord.status] || ord.status}
-                            </span>
-                          </td>
-                          <td className="py-3.5 px-2">
-                            <select
-                              value={ord.status}
-                              onChange={(e) => handleUpdateOrderStatus(ord.id, e.target.value)}
-                              className="bg-gray-50 dark:bg-[#1A1515] text-xs p-1.5 rounded-lg border border-gray-300 dark:border-gray-700 font-bold"
-                            >
-                              {Object.entries(STATUS_LABELS).map(([val, label]) => (
-                                <option key={val} value={val}>{label}</option>
-                              ))}
-                            </select>
-                          </td>
+                {filteredOrders.length === 0 ? (
+                  <EmptyState icon={ShoppingBag} title="لا توجد طلبات مطابقة" />
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-start text-xs">
+                      <thead>
+                        <tr className="border-b border-gray-200 dark:border-gray-800 text-gray-500">
+                          <th className="py-3 px-2">رقم الطلب</th>
+                          <th className="py-3 px-2">العميل والمستلم</th>
+                          <th className="py-3 px-2">التاريخ</th>
+                          <th className="py-3 px-2">المبلغ</th>
+                          <th className="py-3 px-2">الحالة</th>
+                          <th className="py-3 px-2">تحديث</th>
                         </tr>
-                      ))}
-                      {filteredOrders.length === 0 && (
-                        <tr><td colSpan={6} className="py-8 text-center text-gray-400 dark:text-gray-500">لا توجد طلبات مطابقة</td></tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </Panel>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                        {filteredOrders.map((ord) => (
+                          <tr key={ord.id} className="hover:bg-gray-50/60 dark:hover:bg-gray-800/20 transition-colors">
+                            <td className="py-3.5 px-2 font-extrabold text-[#7D0A0A] dark:text-[#D4AF37]">{ord.orderNumber}</td>
+                            <td className="py-3.5 px-2">
+                              <div className="font-bold">{ord.customerName}</div>
+                              <div className="text-[10px] text-gray-500">إلى: {ord.recipientName} ({ord.shippingAddress?.city})</div>
+                            </td>
+                            <td className="py-3.5 px-2 text-gray-500 dark:text-gray-400">{ord.date}</td>
+                            <td className="py-3.5 px-2 font-bold">{formatOmr(ord.total)}</td>
+                            <td className="py-3.5 px-2">
+                              <StatusBadge tone={orderStatusTone(ord.status)} label={STATUS_LABELS[ord.status] || ord.status} />
+                            </td>
+                            <td className="py-3.5 px-2">
+                              <select
+                                value={ord.status}
+                                onChange={(e) => handleUpdateOrderStatus(ord.id, e.target.value)}
+                                className="bg-gray-50 dark:bg-[#1A1515] text-xs p-1.5 rounded-lg border border-gray-300 dark:border-gray-700 font-bold"
+                              >
+                                {Object.entries(STATUS_LABELS).map(([val, label]) => (
+                                  <option key={val} value={val}>{label}</option>
+                                ))}
+                              </select>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </DashboardCard>
             )}
 
             {activeTab === 'products' && (
-              <Panel
+              <DashboardCard
                 title="إدارة المنتجات"
                 action={
                   <button
@@ -558,34 +753,41 @@ export const DashboardPage: React.FC = () => {
                     ))}
                   </select>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {filteredProducts.map((p) => (
-                    <div key={p.id} className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 flex gap-4 items-center bg-gray-50/60 dark:bg-[#151111]">
-                      <img src={p.images?.[0]} alt={p.nameAr} className="w-16 h-16 rounded-xl object-cover shrink-0" loading="lazy" />
-                      <div className="flex-1 space-y-1 text-xs min-w-0">
-                        <h4 className="font-bold text-gray-900 dark:text-gray-100 truncate">{p.nameAr}</h4>
-                        <p className="text-[#7D0A0A] dark:text-[#D4AF37] font-bold">{formatOmr(p.price)}</p>
-                        <span className={`text-[10px] block ${(p.stockQuantity ?? 0) <= 3 ? 'text-amber-600 dark:text-amber-400 font-bold' : 'text-gray-400 dark:text-gray-500'}`}>
-                          {CATEGORY_LABELS[p.category] || p.category} · مخزون: {p.stockQuantity ?? 0}
-                        </span>
+                {filteredProducts.length === 0 ? (
+                  <EmptyState icon={Package} title="لا توجد منتجات مطابقة" />
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filteredProducts.map((p) => (
+                      <div key={p.id} className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 flex gap-4 items-center bg-gray-50/60 dark:bg-[#1A1515]/50">
+                        <img src={p.images?.[0]} alt={p.nameAr} className="w-16 h-16 rounded-xl object-cover shrink-0" loading="lazy" />
+                        <div className="flex-1 space-y-1 text-xs min-w-0">
+                          <h4 className="font-bold text-gray-900 dark:text-gray-100 truncate">{p.nameAr}</h4>
+                          <p className="text-[#7D0A0A] dark:text-[#D4AF37] font-bold">{formatOmr(p.price)}</p>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[10px] text-gray-400 dark:text-gray-500">{CATEGORY_LABELS[p.category] || p.category}</span>
+                            <StatusBadge
+                              tone={stockTone(p.stockQuantity ?? 0)}
+                              label={`مخزون: ${p.stockQuantity ?? 0}`}
+                            />
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-1 shrink-0">
+                          <button onClick={() => openEditProduct(p)} className="p-2 text-gray-400 hover:text-[#D4AF37]">
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleDeleteProduct(p.id)} className="p-2 text-gray-400 hover:text-red-500">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex flex-col gap-1 shrink-0">
-                        <button onClick={() => openEditProduct(p)} className="p-2 text-gray-400 hover:text-[#D4AF37]">
-                          <Pencil className="w-4 h-4" />
-                        </button>
-                        <button onClick={() => handleDeleteProduct(p.id)} className="p-2 text-gray-400 hover:text-red-500">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                  {filteredProducts.length === 0 && <div className="text-gray-400 dark:text-gray-500 text-sm col-span-full text-center py-8">لا توجد منتجات مطابقة</div>}
-                </div>
-              </Panel>
+                    ))}
+                  </div>
+                )}
+              </DashboardCard>
             )}
 
             {activeTab === 'coupons' && (
-              <Panel
+              <DashboardCard
                 title="أكواد الخصم"
                 action={
                   <button
@@ -596,54 +798,58 @@ export const DashboardPage: React.FC = () => {
                   </button>
                 }
               >
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {coupons.map((c) => (
-                    <div key={c.id} className="p-4 rounded-2xl border border-[#D4AF37]/30 bg-gray-50/60 dark:bg-[#151111] space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="font-extrabold text-base text-[#7D0A0A] dark:text-[#D4AF37]">{c.code}</span>
-                        <button onClick={() => handleDeleteCoupon(c.id)} className="text-gray-400 hover:text-red-500">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                {coupons.length === 0 ? (
+                  <EmptyState icon={Tag} title="لا توجد أكواد خصم بعد" />
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {coupons.map((c) => (
+                      <div key={c.id} className="p-4 rounded-2xl border border-[#D4AF37]/30 bg-gray-50/60 dark:bg-[#1A1515]/50 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="font-extrabold text-base text-[#7D0A0A] dark:text-[#D4AF37]">{c.code}</span>
+                          <button onClick={() => handleDeleteCoupon(c.id)} className="text-gray-400 hover:text-red-500">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        <p className="text-xs text-gray-700 dark:text-gray-300 font-bold">خصم {c.discountPercent}%</p>
+                        <p className="text-[11px] text-gray-500 dark:text-gray-400">{c.descriptionAr}</p>
                       </div>
-                      <p className="text-xs text-gray-700 dark:text-gray-300 font-bold">خصم {c.discountPercent}%</p>
-                      <p className="text-[11px] text-gray-500 dark:text-gray-400">{c.descriptionAr}</p>
-                    </div>
-                  ))}
-                  {coupons.length === 0 && <div className="text-gray-400 dark:text-gray-500 text-sm col-span-full text-center py-8">لا توجد أكواد خصم بعد</div>}
-                </div>
-              </Panel>
+                    ))}
+                  </div>
+                )}
+              </DashboardCard>
             )}
 
             {activeTab === 'customers' && (
-              <Panel title="العملاء (مستخرجة من سجل الطلبات)">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-start text-xs">
-                    <thead>
-                      <tr className="border-b border-gray-200 dark:border-gray-800 text-gray-500">
-                        <th className="py-3 px-2">الاسم</th>
-                        <th className="py-3 px-2">الهاتف</th>
-                        <th className="py-3 px-2">المدينة</th>
-                        <th className="py-3 px-2">عدد الطلبات</th>
-                        <th className="py-3 px-2">إجمالي الإنفاق</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                      {customers.map((c) => (
-                        <tr key={c.phone}>
-                          <td className="py-3.5 px-2 font-bold">{c.name}</td>
-                          <td className="py-3.5 px-2 text-gray-500 dark:text-gray-400">{c.phone}</td>
-                          <td className="py-3.5 px-2 text-gray-500 dark:text-gray-400">{c.city}</td>
-                          <td className="py-3.5 px-2">{c.total_orders}</td>
-                          <td className="py-3.5 px-2 font-bold text-[#7D0A0A] dark:text-[#D4AF37]">{formatOmr(c.total_spent)}</td>
+              <DashboardCard title="العملاء (مستخرجة من سجل الطلبات)">
+                {customers.length === 0 ? (
+                  <EmptyState icon={Users} title="لا يوجد عملاء بعد" />
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-start text-xs">
+                      <thead>
+                        <tr className="border-b border-gray-200 dark:border-gray-800 text-gray-500">
+                          <th className="py-3 px-2">الاسم</th>
+                          <th className="py-3 px-2">الهاتف</th>
+                          <th className="py-3 px-2">المدينة</th>
+                          <th className="py-3 px-2">عدد الطلبات</th>
+                          <th className="py-3 px-2">إجمالي الإنفاق</th>
                         </tr>
-                      ))}
-                      {customers.length === 0 && (
-                        <tr><td colSpan={5} className="py-8 text-center text-gray-400 dark:text-gray-500">لا يوجد عملاء بعد</td></tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </Panel>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                        {customers.map((c) => (
+                          <tr key={c.phone} className="hover:bg-gray-50/60 dark:hover:bg-gray-800/20 transition-colors">
+                            <td className="py-3.5 px-2 font-bold">{c.name}</td>
+                            <td className="py-3.5 px-2 text-gray-500 dark:text-gray-400">{c.phone}</td>
+                            <td className="py-3.5 px-2 text-gray-500 dark:text-gray-400">{c.city}</td>
+                            <td className="py-3.5 px-2">{c.total_orders}</td>
+                            <td className="py-3.5 px-2 font-bold text-[#7D0A0A] dark:text-[#D4AF37]">{formatOmr(c.total_spent)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </DashboardCard>
             )}
           </>
         )}
@@ -727,22 +933,22 @@ const SearchInput: React.FC<{ value: string; onChange: (v: string) => void; plac
   </div>
 );
 
-const StatCard: React.FC<{ label: string; value: string }> = ({ label, value }) => (
-  <div className="bg-white dark:bg-[#151111] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 space-y-1.5">
-    <span className="text-[11px] text-gray-500 dark:text-gray-500 font-bold block">{label}</span>
-    <div className="text-2xl font-extrabold text-[#7D0A0A] dark:text-[#D4AF37]">{value}</div>
-  </div>
-);
-
-const Panel: React.FC<{ title: string; action?: React.ReactNode; children: React.ReactNode }> = ({ title, action, children }) => (
-  <div className="bg-white dark:bg-[#151111] p-6 rounded-3xl border border-gray-200 dark:border-gray-800 space-y-4">
-    <div className="flex items-center justify-between">
-      <h3 className="font-bold text-sm text-gray-900 dark:text-gray-100">{title}</h3>
-      {action}
+const SummaryRow: React.FC<{ icon: React.ElementType; label: string; value: string; tone?: 'success' | 'warning' | 'danger' }> = ({ icon: Icon, label, value, tone }) => {
+  const toneClass =
+    tone === 'success' ? 'text-emerald-600 dark:text-emerald-400' :
+    tone === 'warning' ? 'text-amber-600 dark:text-amber-400' :
+    tone === 'danger' ? 'text-red-600 dark:text-red-400' :
+    'text-gray-900 dark:text-gray-100';
+  return (
+    <div className="flex items-center justify-between text-xs">
+      <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+        <Icon className="w-3.5 h-3.5" />
+        <span>{label}</span>
+      </div>
+      <span className={`font-extrabold ${toneClass}`}>{value}</span>
     </div>
-    {children}
-  </div>
-);
+  );
+};
 
 const Field: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
   <div>
