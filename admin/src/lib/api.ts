@@ -7,12 +7,27 @@ if (!API_BASE) {
   console.warn('VITE_API_BASE_URL is not set — API requests will fail. See admin/.env.example.');
 }
 
+const TOKEN_KEY = 'abaq_admin_token';
+
+// A Bearer token stored on this app's own origin is the primary auth
+// mechanism — some browsers (Safari's ITP, and increasingly others) block
+// third-party cookies between the storefront's origin and this separate
+// admin origin, which silently broke cookie-only auth on real devices.
+let authToken: string | null = localStorage.getItem(TOKEN_KEY);
+
+function setToken(token: string | null) {
+  authToken = token;
+  if (token) localStorage.setItem(TOKEN_KEY, token);
+  else localStorage.removeItem(TOKEN_KEY);
+}
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${API_BASE}/api${path}`, {
     ...options,
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
+      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
       ...options.headers,
     },
   });
@@ -31,9 +46,19 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 }
 
 export const api = {
-  login: (username: string, password: string) =>
-    request<{ ok: true }>('/auth?action=login', { method: 'POST', body: JSON.stringify({ username, password }) }),
-  logout: () => request<{ ok: true }>('/auth?action=logout', { method: 'POST' }),
+  login: async (username: string, password: string) => {
+    const res = await request<{ ok: true; token: string }>('/auth?action=login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+    });
+    setToken(res.token);
+    return res;
+  },
+  logout: async () => {
+    const res = await request<{ ok: true }>('/auth?action=logout', { method: 'POST' });
+    setToken(null);
+    return res;
+  },
   me: () => request<{ authenticated: boolean }>('/auth?action=me'),
 
   getProducts: () => request<any[]>('/products'),

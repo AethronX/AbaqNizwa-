@@ -28,9 +28,20 @@ function parseCookies(header: string | undefined): Record<string, string> {
   return out;
 }
 
+function getBearerToken(req: ApiRequest): string | undefined {
+  const header = req.headers.authorization as string | undefined;
+  if (!header?.startsWith('Bearer ')) return undefined;
+  return header.slice('Bearer '.length).trim();
+}
+
 export function isAdminRequest(req: ApiRequest): boolean {
-  const cookies = req.cookies ?? parseCookies(req.headers.cookie as string | undefined);
-  const token = cookies[COOKIE_NAME];
+  // Bearer token is the primary mechanism — some browsers (Safari's ITP,
+  // and increasingly others) block third-party cookies between the
+  // storefront's origin and the separate admin app's origin, which broke
+  // cookie-only auth on real devices. The Authorization header isn't
+  // subject to that restriction. The cookie is still checked as a
+  // fallback for same-origin/legacy cases.
+  const token = getBearerToken(req) ?? (req.cookies ?? parseCookies(req.headers.cookie as string | undefined))[COOKIE_NAME];
   if (!token) return false;
   try {
     jwt.verify(token, getJwtSecret());
@@ -80,7 +91,7 @@ export function applyCors(req: ApiRequest, res: ApiResponse): void {
     res.setHeader('Access-Control-Allow-Credentials', 'true');
   }
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Vary', 'Origin');
 }
 
