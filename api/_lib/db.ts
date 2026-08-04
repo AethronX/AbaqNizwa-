@@ -14,24 +14,25 @@ if (!connectionString) {
   );
 }
 
-// pg's connection-string parser reads `sslmode` from the URL and merges it
-// OVER an explicitly passed `ssl` option (last-write-wins), which silently
-// re-enables strict certificate validation against hosted providers'
-// self-signed pooler certs (e.g. Supabase's Supavisor). Strip it so our
-// explicit `ssl` option below is what actually takes effect.
-function stripSslMode(cs: string): string {
-  try {
-    const url = new URL(cs);
-    url.searchParams.delete('sslmode');
-    url.searchParams.delete('ssl');
-    return url.toString();
-  } catch {
-    return cs;
-  }
+// Passing `connectionString` directly to pg lets its internal parser read
+// `sslmode` from the URL and use that instead of our explicit `ssl` option,
+// which silently re-enables strict certificate validation against hosted
+// providers' self-signed pooler certs (e.g. Supabase's Supavisor). Parsing
+// the string ourselves into discrete fields sidesteps that code path
+// entirely, so the `ssl` option below is guaranteed to be what applies.
+function parseConnectionString(cs: string) {
+  const url = new URL(cs);
+  return {
+    host: url.hostname,
+    port: url.port ? Number(url.port) : 5432,
+    user: decodeURIComponent(url.username),
+    password: decodeURIComponent(url.password),
+    database: url.pathname.replace(/^\//, ''),
+  };
 }
 
 const pool = new Pool({
-  connectionString: stripSslMode(connectionString),
+  ...parseConnectionString(connectionString),
   ssl: { rejectUnauthorized: false },
   max: 1, // one connection per serverless invocation
 });
