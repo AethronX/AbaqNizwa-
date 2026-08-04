@@ -11,7 +11,7 @@ const TONE_CLASSES: Record<Tone, string> = {
 };
 
 export const StatusBadge: React.FC<{ label: string; tone: Tone }> = ({ label, tone }) => (
-  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-extrabold border ${TONE_CLASSES[tone]}`}>
+  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold border ${TONE_CLASSES[tone]}`}>
     {label}
   </span>
 );
