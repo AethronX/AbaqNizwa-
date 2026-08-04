@@ -27,7 +27,7 @@ export const ProgressBarList: React.FC<{ data: Row[]; color?: string; emptyLabel
             <div className="flex items-center justify-between text-xs">
               <span className="text-gray-700 dark:text-gray-300 font-medium truncate max-w-[60%]">{row.label || '—'}</span>
               <span className="text-gray-500 dark:text-gray-400 font-bold shrink-0">
-                {formatValue ? formatValue(row.value) : row.value} <span className="text-gray-400 dark:text-gray-600">({pct}%)</span>
+                {formatValue ? formatValue(row.value) : row.value} <span className="text-gray-500 dark:text-gray-400">({pct}%)</span>
               </span>
             </div>
             <div className="h-2 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
