@@ -39,7 +39,7 @@ export const ActivityFeed: React.FC<{ items: ActivityItem[] }> = ({ items }) => 
             <div className="flex-1 min-w-0 text-xs">
               <p className="text-gray-800 dark:text-gray-200 font-medium truncate">{item.title}</p>
             </div>
-            <span className="text-[10px] text-gray-400 dark:text-gray-500 shrink-0">{item.time}</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">{item.time}</span>
           </div>
         );
       })}

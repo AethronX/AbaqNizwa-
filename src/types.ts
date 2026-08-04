@@ -99,6 +99,7 @@ export interface Order {
   paymentStatus: 'paid' | 'pending' | 'failed';
   trackingTimeline: TimelineStep[];
   couponCode?: string;
+  adminNotes?: string;
 }
 
 

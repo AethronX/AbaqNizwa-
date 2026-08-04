@@ -71,11 +71,15 @@ export const api = {
   getOrders: () => request<any[]>('/orders'),
   updateOrderStatus: (id: string, status: string) =>
     request<any>(`/orders?id=${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  updateOrderNotes: (id: string, notes: string) =>
+    request<any>(`/orders?id=${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify({ notes }) }),
 
   getCoupons: () => request<any[]>('/coupons'),
   createCoupon: (coupon: any) =>
     request<any>('/coupons', { method: 'POST', body: JSON.stringify(coupon) }),
   deleteCoupon: (id: string) => request<void>(`/coupons?id=${encodeURIComponent(id)}`, { method: 'DELETE' }),
+  toggleCoupon: (id: string, active: boolean) =>
+    request<any>(`/coupons?id=${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify({ active }) }),
 
   getCustomers: () => request<any[]>('/customers'),
 
