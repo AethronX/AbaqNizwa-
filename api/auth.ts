@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { handlePreflight, isAdminRequest, signAdminToken, setAdminCookie, clearAdminCookie } from './_lib/auth';
+import { handlePreflight, isAdminRequest, signAdminToken, setAdminCookie, clearAdminCookie } from './_lib/auth.js';
 import type { ApiRequest, ApiResponse } from './_lib/types';
 
 async function login(req: ApiRequest, res: ApiResponse) {
