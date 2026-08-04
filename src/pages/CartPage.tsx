@@ -38,10 +38,10 @@ export const CartPage: React.FC<CartPageProps> = ({ setActiveTab, onProceedCheck
   const { t, language } = useLanguage();
   const [couponCodeInput, setCouponCodeInput] = useState('');
 
-  const handleApplyCoupon = (e: React.FormEvent) => {
+  const handleApplyCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!couponCodeInput) return;
-    const res = applyCoupon(couponCodeInput);
+    const res = await applyCoupon(couponCodeInput);
     if (res.success) {
       setCouponCodeInput('');
     } else {

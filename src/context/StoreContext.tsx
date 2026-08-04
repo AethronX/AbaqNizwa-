@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Product, CartItem, Order, Coupon, Customer, OrderStatus } from '../types';
-import { PRODUCTS as initialProducts, COUPONS as initialCoupons, INITIAL_ORDERS, MOCK_CUSTOMERS } from '../data/mockData';
+import { Product, CartItem, Order, Coupon } from '../types';
+import { PRODUCTS as initialProducts } from '../data/mockData';
+import { api } from '../lib/api';
 
 export type Currency = 'OMR' | 'SAR' | 'USD';
 
@@ -22,21 +23,12 @@ interface StoreContextType {
   clearCart: () => void;
   cartSubtotal: number;
   appliedCoupon: Coupon | null;
-  applyCoupon: (code: string) => { success: boolean; message: string };
+  applyCoupon: (code: string) => Promise<{ success: boolean; message: string }>;
   removeCoupon: () => void;
   discountAmount: number;
   deliveryFee: number;
   cartTotal: number;
-  orders: Order[];
-  createOrder: (orderData: Omit<Order, 'id' | 'orderNumber' | 'date' | 'status' | 'trackingTimeline'>) => Order;
-  updateOrderStatus: (orderId: string, status: OrderStatus) => void;
-  coupons: Coupon[];
-  addCoupon: (coupon: Omit<Coupon, 'id' | 'usageCount'>) => void;
-  deleteCoupon: (id: string) => void;
-  customers: Customer[];
-  addProduct: (product: Omit<Product, 'id'>) => void;
-  updateProduct: (product: Product) => void;
-  deleteProduct: (id: string) => void;
+  createOrder: (orderData: Omit<Order, 'id' | 'orderNumber' | 'date' | 'status' | 'trackingTimeline'>) => void;
   toasts: Toast[];
   showToast: (message: string, type?: 'success' | 'info' | 'error') => void;
   recentlyViewed: Product[];
@@ -45,17 +37,32 @@ interface StoreContextType {
   setSearchQuery: (query: string) => void;
   selectedCategoryFilter: string;
   setSelectedCategoryFilter: (cat: string) => void;
-  isAdmin: boolean;
-  setIsAdmin: (val: boolean) => void;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [products, setProducts] = useState<Product[]>(() => {
-    const saved = localStorage.getItem('abaq_products');
-    return saved ? JSON.parse(saved) : initialProducts;
-  });
+  // Seeded with the bundled catalog so the storefront never shows an
+  // empty grid — swapped for live data once the API responds (and kept
+  // as-is if the API is unreachable or the database hasn't been seeded yet).
+  const [products, setProducts] = useState<Product[]>(initialProducts);
+
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .getProducts()
+      .then((data) => {
+        if (!cancelled && Array.isArray(data) && data.length > 0) {
+          setProducts(data);
+        }
+      })
+      .catch(() => {
+        // Backend not configured yet or unreachable — keep the bundled catalog.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const [currency, setCurrency] = useState<Currency>('OMR');
   const [cart, setCart] = useState<CartItem[]>(() => {
@@ -63,41 +70,15 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return saved ? JSON.parse(saved) : [];
   });
 
-  const [orders, setOrders] = useState<Order[]>(() => {
-    const saved = localStorage.getItem('abaq_orders');
-    return saved ? JSON.parse(saved) : INITIAL_ORDERS;
-  });
-
-  const [coupons, setCoupons] = useState<Coupon[]>(() => {
-    const saved = localStorage.getItem('abaq_coupons');
-    return saved ? JSON.parse(saved) : initialCoupons;
-  });
-
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
-
-  const [customers] = useState<Customer[]>(MOCK_CUSTOMERS);
   const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('all');
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  // Sync state to local storage
-  useEffect(() => {
-    localStorage.setItem('abaq_products', JSON.stringify(products));
-  }, [products]);
 
   useEffect(() => {
     localStorage.setItem('abaq_cart', JSON.stringify(cart));
   }, [cart]);
-
-  useEffect(() => {
-    localStorage.setItem('abaq_orders', JSON.stringify(orders));
-  }, [orders]);
-
-  useEffect(() => {
-    localStorage.setItem('abaq_coupons', JSON.stringify(coupons));
-  }, [coupons]);
 
   // Currency conversion calculations (1 OMR = ~9.75 SAR = ~2.60 USD)
   const formatPrice = (priceInOmr: number) => {
@@ -155,21 +136,17 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return acc + itemPrice * item.quantity;
   }, 0);
 
-  const applyCoupon = (code: string) => {
-    const cleanCode = code.trim().toUpperCase();
-    const found = coupons.find((c) => c.code === cleanCode && c.active);
-    if (!found) {
-      return { success: false, message: 'كود الخصم غير صحيح أو منتهي الصلاحية' };
+  const applyCoupon = async (code: string) => {
+    try {
+      const result = await api.validateCoupon(code, cartSubtotal);
+      if (result.success && result.coupon) {
+        setAppliedCoupon(result.coupon);
+        showToast(result.message + ' 🎁');
+      }
+      return { success: result.success, message: result.message };
+    } catch {
+      return { success: false, message: 'تعذر التحقق من كود الخصم، حاول مرة أخرى' };
     }
-    if (cartSubtotal < found.minOrder) {
-      return {
-        success: false,
-        message: `الحد الأدنى لاستخدام هذا الكود هو ${found.minOrder} ر.ع.`,
-      };
-    }
-    setAppliedCoupon(found);
-    showToast(`تم تطبيق خصم ${found.discountPercent}% بنجاح! 🎁`);
-    return { success: true, message: `تم تطبيق خصم ${found.discountPercent}%` };
   };
 
   const removeCoupon = () => {
@@ -195,77 +172,15 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     });
   };
 
-  const createOrder = (orderData: Omit<Order, 'id' | 'orderNumber' | 'date' | 'status' | 'trackingTimeline'>): Order => {
-    const orderNum = `AN-${Math.floor(10000 + Math.random() * 90000)}`;
-    const newOrder: Order = {
-      ...orderData,
-      id: `ord-${Date.now()}`,
-      orderNumber: orderNum,
-      date: new Date().toISOString().replace('T', ' ').substring(0, 16),
-      status: 'pending',
-      trackingTimeline: [
-        { titleAr: 'تم استلام الطلب والدفع', titleEn: 'Order Received & Paid', time: 'الآن', completed: true, current: true },
-        { titleAr: 'اختيار الورد والتجهيز', titleEn: 'Selecting Fresh Roses', time: 'قيد الانتظار', completed: false },
-        { titleAr: 'تنسيق الباقة والتغليف الملكي', titleEn: 'Arranging Bouquet & Wrapping', time: 'قيد الانتظار', completed: false },
-        { titleAr: 'خرجت مع مندوب التوصيل', titleEn: 'Out for Delivery', time: 'قيد الانتظار', completed: false },
-        { titleAr: 'تم التوصيل بنجاح', titleEn: 'Delivered', time: 'قيد الانتظار', completed: false },
-      ]
-    };
-    setOrders((prev) => [newOrder, ...prev]);
+  const createOrder = (orderData: Omit<Order, 'id' | 'orderNumber' | 'date' | 'status' | 'trackingTimeline'>) => {
+    // The order is recorded for the admin dashboard, but WhatsApp is the
+    // real confirmation channel — a slow or unreachable API must never
+    // block the customer from sending their order.
+    api.createOrder(orderData).catch(() => {
+      console.error('Failed to persist order to backend; customer still received WhatsApp confirmation.');
+    });
     clearCart();
-    showToast(`تمت عملية الشراء بنجاح! رقم الطلب ${orderNum} 🌸`);
-    return newOrder;
-  };
-
-  const updateOrderStatus = (orderId: string, status: OrderStatus) => {
-    setOrders((prev) =>
-      prev.map((o) => {
-        if (o.id !== orderId) return o;
-        const updatedTimeline = o.trackingTimeline.map((t, idx) => {
-          if (status === 'preparing' && idx <= 1) return { ...t, completed: true, current: idx === 1 };
-          if (status === 'arranging' && idx <= 2) return { ...t, completed: true, current: idx === 2 };
-          if (status === 'shipped' && idx <= 3) return { ...t, completed: true, current: idx === 3 };
-          if (status === 'delivered') return { ...t, completed: true, current: false };
-          return t;
-        });
-        return { ...o, status, trackingTimeline: updatedTimeline };
-      })
-    );
-    showToast('تم تحديث حالة الطلب بنجاح');
-  };
-
-  const addCoupon = (couponData: Omit<Coupon, 'id' | 'usageCount'>) => {
-    const newCoupon: Coupon = {
-      ...couponData,
-      id: `c-${Date.now()}`,
-      usageCount: 0,
-    };
-    setCoupons((prev) => [newCoupon, ...prev]);
-    showToast('تمت إضافة كود الخصم الجديد');
-  };
-
-  const deleteCoupon = (id: string) => {
-    setCoupons((prev) => prev.filter((c) => c.id !== id));
-    showToast('تم حذف كود الخصم', 'info');
-  };
-
-  const addProduct = (p: Omit<Product, 'id'>) => {
-    const newP: Product = {
-      ...p,
-      id: `p-${Date.now()}`,
-    };
-    setProducts((prev) => [newP, ...prev]);
-    showToast('تمت إضافة المنتج الجديد بنجاح ✨');
-  };
-
-  const updateProduct = (updated: Product) => {
-    setProducts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
-    showToast('تم تحديث بيانات المنتج بنجاح');
-  };
-
-  const deleteProduct = (id: string) => {
-    setProducts((prev) => prev.filter((p) => p.id !== id));
-    showToast('تم حذف المنتج', 'info');
+    showToast('تمت عملية الشراء بنجاح! 🌸');
   };
 
   return (
@@ -287,16 +202,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         discountAmount,
         deliveryFee,
         cartTotal,
-        orders,
         createOrder,
-        updateOrderStatus,
-        coupons,
-        addCoupon,
-        deleteCoupon,
-        customers,
-        addProduct,
-        updateProduct,
-        deleteProduct,
         toasts,
         showToast,
         recentlyViewed,
@@ -305,8 +211,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setSearchQuery,
         selectedCategoryFilter,
         setSelectedCategoryFilter,
-        isAdmin,
-        setIsAdmin,
       }}
     >
       {children}
