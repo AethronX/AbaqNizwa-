@@ -1,5 +1,5 @@
-import { sql, ensureSchema } from './_lib/db';
-import { handlePreflight, requireAdmin } from './_lib/auth';
+import { sql, ensureSchema } from './_lib/db.js';
+import { handlePreflight, requireAdmin } from './_lib/auth.js';
 import type { ApiRequest, ApiResponse } from './_lib/types';
 
 // Customers aren't a separate write-model — they're derived from orders,
