@@ -53,9 +53,13 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   if (req.method === 'PATCH' && id) {
     if (!requireAdmin(req, res)) return;
-    const { status } = req.body || {};
-    if (typeof status !== 'string' || !VALID_STATUSES.includes(status)) {
+    const { status, notes } = req.body || {};
+    if (status !== undefined && (typeof status !== 'string' || !VALID_STATUSES.includes(status))) {
       res.status(400).json({ error: 'Invalid status' });
+      return;
+    }
+    if (notes !== undefined && typeof notes !== 'string') {
+      res.status(400).json({ error: 'Invalid notes' });
       return;
     }
     const existing = await sql`SELECT data FROM orders WHERE id = ${id}`;
@@ -64,16 +68,24 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       return;
     }
     const order = existing[0].data;
-    const updatedTimeline = order.trackingTimeline.map((t: any, idx: number) => {
-      if (status === 'preparing' && idx <= 1) return { ...t, completed: true, current: idx === 1 };
-      if (status === 'arranging' && idx <= 2) return { ...t, completed: true, current: idx === 2 };
-      if (status === 'shipped' && idx <= 3) return { ...t, completed: true, current: idx === 3 };
-      if (status === 'delivered') return { ...t, completed: true, current: false };
-      return t;
-    });
-    const updated = { ...order, status, trackingTimeline: updatedTimeline };
+
+    let updated = order;
+    if (status) {
+      const updatedTimeline = order.trackingTimeline.map((t: any, idx: number) => {
+        if (status === 'preparing' && idx <= 1) return { ...t, completed: true, current: idx === 1 };
+        if (status === 'arranging' && idx <= 2) return { ...t, completed: true, current: idx === 2 };
+        if (status === 'shipped' && idx <= 3) return { ...t, completed: true, current: idx === 3 };
+        if (status === 'delivered') return { ...t, completed: true, current: false };
+        return t;
+      });
+      updated = { ...updated, status, trackingTimeline: updatedTimeline };
+    }
+    if (notes !== undefined) {
+      updated = { ...updated, adminNotes: notes };
+    }
+
     await sql`
-      UPDATE orders SET status = ${status}, data = ${JSON.stringify(updated)}, updated_at = now()
+      UPDATE orders SET status = ${updated.status}, data = ${JSON.stringify(updated)}, updated_at = now()
       WHERE id = ${id}
     `;
     res.status(200).json(updated);

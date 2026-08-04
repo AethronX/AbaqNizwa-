@@ -8,5 +8,6 @@
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  font-family: 'Tahoma', 'Segoe UI', Arial, sans-serif;
+  line-height: 1.6;
 }

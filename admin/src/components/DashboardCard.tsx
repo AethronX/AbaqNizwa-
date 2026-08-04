@@ -14,7 +14,7 @@ export const DashboardCard: React.FC<{
       <div className="flex items-start justify-between gap-3">
         <div>
           {title && <h3 className="font-bold text-sm text-gray-900 dark:text-gray-100">{title}</h3>}
-          {subtitle && <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">{subtitle}</p>}
+          {subtitle && <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{subtitle}</p>}
         </div>
         {action}
       </div>

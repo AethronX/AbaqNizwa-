@@ -70,5 +70,22 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
+  if (req.method === 'PATCH' && id) {
+    const { active } = req.body || {};
+    if (typeof active !== 'boolean') {
+      res.status(400).json({ error: 'Invalid active value' });
+      return;
+    }
+    const existing = await sql`SELECT data FROM coupons WHERE id = ${id}`;
+    if (existing.length === 0) {
+      res.status(404).json({ error: 'Coupon not found' });
+      return;
+    }
+    const updated = { ...existing[0].data, active };
+    await sql`UPDATE coupons SET active = ${active}, data = ${JSON.stringify(updated)} WHERE id = ${id}`;
+    res.status(200).json(updated);
+    return;
+  }
+
   res.status(405).json({ error: 'Method not allowed' });
 }
