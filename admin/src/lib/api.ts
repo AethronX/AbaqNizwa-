@@ -32,29 +32,29 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
 export const api = {
   login: (username: string, password: string) =>
-    request<{ ok: true }>('/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) }),
-  logout: () => request<{ ok: true }>('/auth/logout', { method: 'POST' }),
-  me: () => request<{ authenticated: boolean }>('/auth/me'),
+    request<{ ok: true }>('/auth?action=login', { method: 'POST', body: JSON.stringify({ username, password }) }),
+  logout: () => request<{ ok: true }>('/auth?action=logout', { method: 'POST' }),
+  me: () => request<{ authenticated: boolean }>('/auth?action=me'),
 
   getProducts: () => request<any[]>('/products'),
   createProduct: (product: any) =>
     request<any>('/products', { method: 'POST', body: JSON.stringify(product) }),
   updateProduct: (product: any) =>
-    request<any>(`/products/${product.id}`, { method: 'PUT', body: JSON.stringify(product) }),
-  deleteProduct: (id: string) => request<void>(`/products/${id}`, { method: 'DELETE' }),
+    request<any>(`/products?id=${encodeURIComponent(product.id)}`, { method: 'PUT', body: JSON.stringify(product) }),
+  deleteProduct: (id: string) => request<void>(`/products?id=${encodeURIComponent(id)}`, { method: 'DELETE' }),
 
   getOrders: () => request<any[]>('/orders'),
   updateOrderStatus: (id: string, status: string) =>
-    request<any>(`/orders/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+    request<any>(`/orders?id=${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify({ status }) }),
 
   getCoupons: () => request<any[]>('/coupons'),
   createCoupon: (coupon: any) =>
     request<any>('/coupons', { method: 'POST', body: JSON.stringify(coupon) }),
-  deleteCoupon: (id: string) => request<void>(`/coupons/${id}`, { method: 'DELETE' }),
+  deleteCoupon: (id: string) => request<void>(`/coupons?id=${encodeURIComponent(id)}`, { method: 'DELETE' }),
 
   getCustomers: () => request<any[]>('/customers'),
 
-  getAnalyticsSummary: (days: number) => request<any>(`/analytics/summary?days=${days}`),
+  getAnalyticsSummary: (days: number) => request<any>(`/analytics?days=${days}`),
 
   seed: () => request<any>('/admin/seed', { method: 'POST' }),
 };

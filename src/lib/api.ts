@@ -27,23 +27,18 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
 export const api = {
   getProducts: () => request<any[]>('/products'),
-  createProduct: (product: any) =>
-    request<any>('/products', { method: 'POST', body: JSON.stringify(product) }),
-  updateProduct: (product: any) =>
-    request<any>(`/products/${product.id}`, { method: 'PUT', body: JSON.stringify(product) }),
-  deleteProduct: (id: string) => request<void>(`/products/${id}`, { method: 'DELETE' }),
 
   createOrder: (order: any) =>
     request<any>('/orders', { method: 'POST', body: JSON.stringify(order) }),
 
   validateCoupon: (code: string, subtotal: number) =>
-    request<{ success: boolean; message: string; coupon?: any }>('/coupons/validate', {
+    request<{ success: boolean; message: string; coupon?: any }>('/coupons?action=validate', {
       method: 'POST',
       body: JSON.stringify({ code, subtotal }),
     }),
 
   track: (payload: { path: string; referrer?: string; sessionId?: string }) =>
-    fetch(`${API_BASE}/api/analytics/track`, {
+    fetch(`${API_BASE}/api/analytics`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
