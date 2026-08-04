@@ -97,24 +97,24 @@ async function summary(req: ApiRequest, res: ApiResponse) {
     sql`
       SELECT to_char(date_trunc('day', created_at), 'YYYY-MM-DD') AS day, COUNT(*)::int AS orders, COALESCE(SUM(total), 0)::float AS revenue
       FROM orders
-      WHERE created_at >= now() - make_interval(days => ${days})
+      WHERE created_at >= now() - make_interval(days => ${days}) AND status != 'cancelled'
       GROUP BY 1 ORDER BY 1 ASC
     `,
     sql`
       SELECT COUNT(*)::int AS total_orders, COALESCE(SUM(total), 0)::float AS total_revenue, COALESCE(AVG(total), 0)::float AS avg_order_value
       FROM orders
-      WHERE created_at >= now() - make_interval(days => ${days})
+      WHERE created_at >= now() - make_interval(days => ${days}) AND status != 'cancelled'
     `,
     sql`
       SELECT elem -> 'product' ->> 'nameAr' AS name_ar, elem -> 'product' ->> 'nameEn' AS name_en, COUNT(*)::int AS count
       FROM orders, jsonb_array_elements(data -> 'items') AS elem
-      WHERE orders.created_at >= now() - make_interval(days => ${days})
+      WHERE orders.created_at >= now() - make_interval(days => ${days}) AND orders.status != 'cancelled'
       GROUP BY 1, 2 ORDER BY count DESC LIMIT 8
     `,
     sql`
       SELECT data -> 'shippingAddress' ->> 'city' AS city, COUNT(*)::int AS count
       FROM orders
-      WHERE created_at >= now() - make_interval(days => ${days})
+      WHERE created_at >= now() - make_interval(days => ${days}) AND status != 'cancelled'
       GROUP BY 1 ORDER BY count DESC LIMIT 8
     `,
   ]);
