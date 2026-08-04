@@ -58,6 +58,22 @@ function MainApp() {
     });
   }, [activeTab]);
 
+  // Periodic heartbeat while the tab is open and visible, so the admin
+  // dashboard's "live visitors" count reflects people actively browsing,
+  // not just the moment they last navigated.
+  useEffect(() => {
+    const sendHeartbeat = () => {
+      if (document.visibilityState !== 'visible') return;
+      api.track({
+        path: `/${activeTab}`,
+        sessionId: getSessionId(),
+        eventType: 'heartbeat',
+      });
+    };
+    const interval = setInterval(sendHeartbeat, 30000);
+    return () => clearInterval(interval);
+  }, [activeTab]);
+
   const handleSelectProduct = (product: Product) => {
     setSelectedProduct(product);
     setActiveTab('product-details');

@@ -37,7 +37,7 @@ export const api = {
       body: JSON.stringify({ code, subtotal }),
     }),
 
-  track: (payload: { path: string; referrer?: string; sessionId?: string }) =>
+  track: (payload: { path: string; referrer?: string; sessionId?: string; eventType?: string }) =>
     fetch(`${API_BASE}/api/analytics`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
