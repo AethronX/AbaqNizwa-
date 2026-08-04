@@ -40,12 +40,12 @@ export const PrivacyPage: React.FC = () => {
         </p>
 
         <h3 className="font-bold text-sm text-gray-900 dark:text-gray-100">
-          {language === 'en' ? '3. Secure Payment Gateway' : '٣. حماية الدفع الإلكتروني'}
+          {language === 'en' ? '3. Order Confirmation & Payment' : '٣. تأكيد الطلب والدفع'}
         </h3>
         <p>
           {language === 'en'
-            ? 'All digital transactions are encrypted through certified Omani payment portals (Thawani & Apple Pay). Card information is never stored on our servers.'
-            : 'تتم كافة المعاملات المالية المشفرة عبر بوابات معتمدة ومأمونة كبوابة ثواني العمانية ومزودي Apple Pay دون تخزين بيانات بطاقتك البنكية في خوادمنا.'}
+            ? 'We do not process card payments or store any payment information on our servers. Every order is confirmed with you directly over WhatsApp, where the payment method is arranged.'
+            : 'لا نقوم بمعالجة أي مدفوعات بالبطاقة ولا نخزّن أي بيانات دفع في خوادمنا. يتم تأكيد كل طلب معك مباشرة عبر واتساب، وتُحدَّد طريقة الدفع عند التأكيد.'}
         </p>
       </div>
     </div>

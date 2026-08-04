@@ -34,8 +34,8 @@ export const FAQPage: React.FC = () => {
     {
       qAr: 'ما هي طرق الدفع المتاحة لدى متجر عبق نزوى؟',
       qEn: 'What payment methods are supported by Abaq Nizwa?',
-      aAr: 'نوفر الدفع عبر Apple Pay، بوابة ثواني العمانية (Thawani)، فيزا وماستركارد، بالإضافة إلى خيار الدفع عند الاستلام.',
-      aEn: 'We support Apple Pay, Thawani Omani Payment Gateway, Visa & Mastercard, as well as Cash on Delivery.'
+      aAr: 'بعد إرسال طلبك من خلال الموقع، يتم تأكيده مباشرة معك عبر واتساب، وتحدَّد طريقة الدفع (نقداً عند الاستلام أو تحويل بنكي) عند التأكيد.',
+      aEn: 'After you submit your order on the website, we confirm it with you directly over WhatsApp, where the payment method (cash on delivery or bank transfer) is arranged.'
     },
     {
       qAr: 'كيف يمكنني تصميم باقة ورد خاصة بحسب ميزانيتي؟',
