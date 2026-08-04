@@ -1,7 +1,7 @@
 import { sql, ensureSchema } from '../_lib/db.js';
 import { handlePreflight, requireAdmin } from '../_lib/auth.js';
 import type { ApiRequest, ApiResponse } from '../_lib/types';
-import { PRODUCTS, COUPONS } from '../../src/data/mockData.js';
+import { SEED_PRODUCTS as PRODUCTS, SEED_COUPONS as COUPONS } from '../_lib/seed-data.js';
 
 // One-time bootstrap: loads the existing product catalog and coupons into
 // a freshly connected, empty database. Safe to call more than once — it
