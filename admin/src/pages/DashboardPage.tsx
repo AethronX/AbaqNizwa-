@@ -45,6 +45,7 @@ export const DashboardPage: React.FC = () => {
   const [error, setError] = useState('');
   const [seedResult, setSeedResult] = useState<string>('');
   const [seeding, setSeeding] = useState(false);
+  const [liveVisitors, setLiveVisitors] = useState<number | null>(null);
 
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [newProd, setNewProd] = useState({
@@ -55,8 +56,8 @@ export const DashboardPage: React.FC = () => {
     code: '', discountPercent: 10, minOrder: 0, validUntil: '', descriptionAr: '', descriptionEn: '', active: true,
   });
 
-  const loadAll = async () => {
-    setLoading(true);
+  const loadAll = async (silent = false) => {
+    if (!silent) setLoading(true);
     setError('');
     try {
       const [p, o, c, cu, an] = await Promise.all([
@@ -72,9 +73,9 @@ export const DashboardPage: React.FC = () => {
       setCustomers(cu);
       setAnalytics(an);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'تعذر تحميل البيانات');
+      if (!silent) setError(err instanceof Error ? err.message : 'تعذر تحميل البيانات');
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
@@ -82,6 +83,28 @@ export const DashboardPage: React.FC = () => {
     loadAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rangeDays]);
+
+  // Anything that happens on the storefront (new orders, coupon usage...)
+  // shows up here without a manual refresh — background poll every 20s.
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') loadAll(true);
+    }, 20000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rangeDays]);
+
+  // Live visitor count — separate, much faster poll (5s) since it's a
+  // cheap single-row query, independent of the heavier full-data refresh.
+  useEffect(() => {
+    const poll = () => {
+      if (document.visibilityState !== 'visible') return;
+      api.getLiveVisitors().then((r) => setLiveVisitors(r.activeVisitors)).catch(() => {});
+    };
+    poll();
+    const interval = setInterval(poll, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSeed = async () => {
     setSeeding(true);
@@ -161,13 +184,24 @@ export const DashboardPage: React.FC = () => {
             <Sparkles className="w-5 h-5" />
             <span>لوحة تحكم عبق نزوى</span>
           </div>
-          <button
-            onClick={logout}
-            className="flex items-center gap-1.5 text-xs font-bold text-gray-400 hover:text-white transition-colors"
-          >
-            <LogOut className="w-4 h-4" />
-            تسجيل الخروج
-          </button>
+          <div className="flex items-center gap-4">
+            {liveVisitors !== null && (
+              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-900 px-3 py-1.5 rounded-full">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                </span>
+                <span>{liveVisitors} زائر الآن</span>
+              </div>
+            )}
+            <button
+              onClick={logout}
+              className="flex items-center gap-1.5 text-xs font-bold text-gray-400 hover:text-white transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              تسجيل الخروج
+            </button>
+          </div>
         </div>
       </header>
 
@@ -175,7 +209,7 @@ export const DashboardPage: React.FC = () => {
         {error && (
           <div className="bg-red-950/40 border border-red-900 text-red-300 text-sm rounded-2xl p-4 flex items-center justify-between">
             <span>{error}</span>
-            <button onClick={loadAll} className="font-bold underline">إعادة المحاولة</button>
+            <button onClick={() => loadAll()} className="font-bold underline">إعادة المحاولة</button>
           </div>
         )}
 

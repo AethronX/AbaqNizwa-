@@ -55,6 +55,7 @@ export const api = {
   getCustomers: () => request<any[]>('/customers'),
 
   getAnalyticsSummary: (days: number) => request<any>(`/analytics?days=${days}`),
+  getLiveVisitors: () => request<{ activeVisitors: number }>('/analytics?live=1'),
 
   seed: () => request<any>('/admin/seed', { method: 'POST' }),
 };

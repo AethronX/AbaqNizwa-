@@ -33,7 +33,22 @@ async function track(req: ApiRequest, res: ApiResponse) {
   res.status(204).end();
 }
 
+// Fast, cheap path for frequent polling — "visitors active in the last
+// couple of minutes" as a live-ish proxy for concurrent visitors, without
+// running the full multi-query summary on every poll.
+async function liveVisitors(req: ApiRequest, res: ApiResponse) {
+  if (!requireAdmin(req, res)) return;
+  const rows = await sql<{ active: number }>`
+    SELECT COUNT(DISTINCT session_id)::int AS active
+    FROM analytics_events
+    WHERE created_at >= now() - interval '2 minutes'
+      AND event_type IN ('pageview', 'heartbeat')
+  `;
+  res.status(200).json({ activeVisitors: rows[0]?.active ?? 0 });
+}
+
 async function summary(req: ApiRequest, res: ApiResponse) {
+  if (req.query.live === '1') return liveVisitors(req, res);
   if (!requireAdmin(req, res)) return;
 
   const daysParam = Number(req.query.days);
