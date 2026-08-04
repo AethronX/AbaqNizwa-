@@ -16,7 +16,7 @@ import {
   Gift,
   Heart,
   Star,
-  ShieldCheck,
+  MessageCircle,
   Truck,
   RotateCcw,
   Instagram,
@@ -209,14 +209,14 @@ export const HomePage: React.FC<HomePageProps> = ({ setActiveTab, onSelectProduc
 
           <div className="flex items-center gap-3 p-2.5 sm:p-3 rounded-xl bg-gray-50/70 dark:bg-white/5 border border-transparent hover:border-[#D4AF37]/30 transition-all">
             <div className="w-10 h-10 rounded-xl bg-[#FCECEF] dark:bg-[#7D0A0A]/30 text-[#7D0A0A] dark:text-[#D4AF37] flex items-center justify-center shrink-0 shadow-sm">
-              <ShieldCheck className="w-5 h-5" />
+              <MessageCircle className="w-5 h-5" />
             </div>
             <div>
               <p className="font-bold text-xs sm:text-sm text-gray-900 dark:text-gray-100">
-                {language === 'en' ? '100% Secure Payment' : 'دفع آمن ومضمون 100%'}
+                {language === 'en' ? 'Order Confirmation via WhatsApp' : 'تأكيد الطلب عبر واتساب'}
               </p>
               <p className="text-[11px] text-gray-500 dark:text-gray-400">
-                {language === 'en' ? 'Thawani & Debit Card Options' : 'عبر ثواني والبطاقات البنكية'}
+                {language === 'en' ? 'Direct, fast communication with our team' : 'تواصل مباشر وسريع مع فريقنا'}
               </p>
             </div>
           </div>
