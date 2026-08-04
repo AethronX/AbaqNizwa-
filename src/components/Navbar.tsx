@@ -29,7 +29,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
     setCurrency,
     searchQuery,
     setSearchQuery,
-    isAdmin,
   } = useStore();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -199,16 +198,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
               </span>
             )}
           </button>
-
-          {/* Admin shortcut if admin mode */}
-          {isAdmin && (
-            <button
-              onClick={() => handleNavClick('admin')}
-              className="hidden sm:inline-block bg-[#D4AF37] text-[#7D0A0A] font-bold px-2.5 py-1 rounded-md text-xs border border-[#7D0A0A]/30 shadow-sm shrink-0"
-            >
-              الأدمن
-            </button>
-          )}
 
           {/* Mobile Menu Toggle */}
           <button

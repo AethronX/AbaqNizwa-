@@ -25,7 +25,6 @@ const translations: Record<string, { ar: string; en: string }> = {
   nav_occasions: { ar: 'المناسبات', en: 'Occasions' },
   nav_about: { ar: 'عن عبق نزوى', en: 'About Us' },
   nav_contact: { ar: 'تواصل معنا', en: 'Contact Us' },
-  nav_admin: { ar: 'لوحة التحكم', en: 'Admin Portal' },
   nav_cart: { ar: 'سلة الهدايا', en: 'Gift Basket' },
 
   // Categories
@@ -107,14 +106,6 @@ const translations: Record<string, { ar: string; en: string }> = {
   order_placed_success: { ar: 'تم استلام طلبك بنجاح!', en: 'Order Placed Successfully!' },
   order_number_is: { ar: 'رقم طلبك هو:', en: 'Your Order Number is:' },
 
-  // Admin
-  admin_dashboard: { ar: 'لوحة تحكم إدارة عبق نزوى', en: 'Abaq Nizwa Management Dashboard' },
-  admin_products: { ar: 'إدارة المنتجات', en: 'Products Management' },
-  admin_orders: { ar: 'إدارة الطلبات', en: 'Orders Management' },
-  admin_customers: { ar: 'إدارة العملاء', en: 'Customers Management' },
-  admin_coupons: { ar: 'إدارة الكوبونات', en: 'Coupons Management' },
-  admin_analytics: { ar: 'تقارير المبيعات', en: 'Sales Analytics' },
-  add_product: { ar: 'إضافة منتج جديد', en: 'Add New Product' },
 
   // Tracking
   track_title: { ar: 'تتبع حالة طلب الهدايا', en: 'Track Gift Order Status' },

@@ -1,4 +1,4 @@
-import React, { useState, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { StoreProvider } from './context/StoreContext';
@@ -7,9 +7,20 @@ import { Footer } from './components/Footer';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { ToastContainer } from './components/ToastContainer';
 import { MobileBottomNav } from './components/MobileBottomNav';
+import { api } from './lib/api';
 
 import { HomePage } from './pages/HomePage';
 import { Product } from './types';
+
+const SESSION_ID_KEY = 'abaq_analytics_session';
+function getSessionId(): string {
+  let id = sessionStorage.getItem(SESSION_ID_KEY);
+  if (!id) {
+    id = `s-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    sessionStorage.setItem(SESSION_ID_KEY, id);
+  }
+  return id;
+}
 
 // Lazy-loaded routes: only fetched when the visitor actually navigates to them,
 // keeping the initial homepage bundle small.
@@ -25,7 +36,6 @@ const ContactPage = lazy(() => import('./pages/ContactPage').then(m => ({ defaul
 const FAQPage = lazy(() => import('./pages/FAQPage').then(m => ({ default: m.FAQPage })));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage').then(m => ({ default: m.PrivacyPage })));
 const TermsPage = lazy(() => import('./pages/TermsPage').then(m => ({ default: m.TermsPage })));
-const AdminDashboard = lazy(() => import('./pages/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
 
 const PageLoadingFallback = () => (
   <div className="flex items-center justify-center min-h-[50vh]">
@@ -36,6 +46,17 @@ const PageLoadingFallback = () => (
 function MainApp() {
   const [activeTab, setActiveTab] = useState<string>('home');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const lastTrackedTab = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (lastTrackedTab.current === activeTab) return;
+    lastTrackedTab.current = activeTab;
+    api.track({
+      path: `/${activeTab}`,
+      referrer: document.referrer || undefined,
+      sessionId: getSessionId(),
+    });
+  }, [activeTab]);
 
   const handleSelectProduct = (product: Product) => {
     setSelectedProduct(product);
@@ -103,8 +124,6 @@ function MainApp() {
         {activeTab === 'faq' && <FAQPage />}
         {activeTab === 'privacy' && <PrivacyPage />}
         {activeTab === 'terms' && <TermsPage />}
-
-        {activeTab === 'admin' && <AdminDashboard />}
         </Suspense>
       </main>
 
